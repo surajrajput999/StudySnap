@@ -101,7 +101,7 @@ export default function Page() {
             {isSignedIn ? (
               <UserButton />
             ) : (
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" forceRedirectUrl="/" signUpForceRedirectUrl="/">
                 <button className="md3-btn md3-btn-primary" style={{ padding: '8px 18px', fontSize: '13px' }}>
                   <LogIn size={14} /> Sign In
                 </button>

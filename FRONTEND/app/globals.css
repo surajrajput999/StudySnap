@@ -416,3 +416,8 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--elevation-1);
   border: 1px solid var(--outline-variant);
 }
+
+/* ─── Hide Clerk Dev Banner ─── */
+.cl-internal-1hp5nqm {
+  display: none !important;
+}
