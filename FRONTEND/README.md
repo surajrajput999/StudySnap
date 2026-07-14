@@ -2,12 +2,6 @@
 
 The Next.js 16 progressive web app with a premium Material Design 3 interface.
 
-## Screenshots
-
-| Dashboard | Editor | AI Chat | Mobile |
-|-----------|--------|---------|--------|
-| <img src="https://placehold.co/300x200/0061A4/FFFFFF?text=Dashboard" alt="Dashboard" width="150"> | <img src="https://placehold.co/300x200/00497E/FFFFFF?text=Editor" alt="Editor" width="150"> | <img src="https://placehold.co/300x200/10B981/FFFFFF?text=AI+Chat" alt="AI Chat" width="150"> | <img src="https://placehold.co/150x280/0061A4/FFFFFF?text=Mobile" alt="Mobile" width="75"> |
-
 ## Key Files
 
 | File | Purpose |

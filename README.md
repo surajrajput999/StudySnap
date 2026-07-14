@@ -1,7 +1,8 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/FRONTEND/public/studysnap-logo.svg">
-  <img alt="StudySnap" src="/FRONTEND/public/studysnap-logo.svg" width="100%">
-</picture>
+<p align="center">
+  <img src="FRONTEND/public/studysnap-logo.svg" alt="StudySnap" width="100">
+</p>
+
+<h1 align="center">StudySnap</h1>
 
 <p align="center">
   <strong>Your Intelligent Study Companion — Create, Organize, Listen & Revise</strong>
@@ -16,30 +17,6 @@
   <img src="https://img.shields.io/badge/Groq-10B981?style=flat-square&logo=llama&logoColor=white" alt="Groq AI">
   <img src="https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
 </p>
-
----
-
-## Screenshots
-
-### Dashboard
-| Desktop | Mobile |
-|---------|--------|
-| <img src="https://placehold.co/600x400/0061A4/FFFFFF?text=StudySnap+Dashboard" alt="Desktop Dashboard" width="300"> | <img src="https://placehold.co/280x500/0061A4/FFFFFF?text=Mobile+Dashboard" alt="Mobile Dashboard" width="140"> |
-
-### Note Editor
-| Editor View | Voice Features | PDF Export |
-|-------------|----------------|-----------|
-| <img src="https://placehold.co/400x280/00497E/FFFFFF?text=Note+Editor" alt="Note Editor" width="200"> | <img src="https://placehold.co/400x280/003D6B/FFFFFF?text=Voice+Features" alt="Voice Features" width="200"> | <img src="https://placehold.co/400x280/0061A4/FFFFFF?text=PDF+Export" alt="PDF Export" width="200"> |
-
-### AI Assistant
-| Chat | MCQ Quiz | Flashcards | Translate |
-|------|----------|------------|-----------|
-| <img src="https://placehold.co/300x200/10B981/FFFFFF?text=AI+Chat" alt="AI Chat" width="150"> | <img src="https://placehold.co/300x200/3B82F6/FFFFFF?text=MCQ+Quiz" alt="MCQ Quiz" width="150"> | <img src="https://placehold.co/300x200/EC4899/FFFFFF?text=Flashcards" alt="Flashcards" width="150"> | <img src="https://placehold.co/300x200/8B5CF6/FFFFFF?text=Translate" alt="Translate" width="150"> |
-
-### Features
-| Smart Revision | Study Map | Profile |
-|----------------|-----------|---------|
-| <img src="https://placehold.co/400x250/F59E0B/FFFFFF?text=Spaced+Repetition" alt="Revision" width="200"> | <img src="https://placehold.co/400x250/10B981/FFFFFF?text=Study+Zones+Map" alt="Study Map" width="200"> | <img src="https://placehold.co/400x250/0061A4/FFFFFF?text=Student+Profile" alt="Profile" width="200"> |
 
 ---
 
