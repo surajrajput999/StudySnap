@@ -8,3 +8,5 @@ dist
 .DS_Store
 Thumbs.db
 FRONTEND/.env.local
+shot.mjs
+screenshots/
