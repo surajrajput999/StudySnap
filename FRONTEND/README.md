@@ -1,6 +1,14 @@
-# StudySnap — Frontend
+<div align="center">
+  <img src="FRONTEND/public/studysnap-logo.svg" width="60" alt="StudySnap">
+  <h1>StudySnap — Frontend</h1>
+  <p>Next.js 16 progressive web app with premium Material Design 3 interface</p>
+</div>
 
-The Next.js 16 progressive web app with a premium Material Design 3 interface.
+## Screenshots
+
+| Dashboard | Editor | AI Chat | Mobile |
+|-----------|--------|---------|--------|
+| <img src="public/screenshots/dashboard-desktop.png" width="200"> | <img src="public/screenshots/editor-desktop.png" width="200"> | <img src="public/screenshots/ai-desktop.png" width="200"> | <img src="public/screenshots/dashboard-mobile.png" width="80"> |
 
 ## Key Files
 
