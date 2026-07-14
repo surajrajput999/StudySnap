@@ -418,6 +418,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ─── Hide Clerk Dev Banner ─── */
-.cl-internal-1hp5nqm {
+.cl-internal-1hp5nqm,
+.cl-internal-18t7b6f,
+.cl-internal-1c5ap0p,
+[class*="cl-developmentBanner"],
+.cl-user-button-popover [class*="develop"],
+#cl-keyless-banner,
+[data-clerk-dev-banner] {
   display: none !important;
 }
