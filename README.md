@@ -29,9 +29,9 @@
       <td align="center"><strong>Dark Mode</strong></td>
     </tr>
     <tr>
-      <td><img src="FRONTEND/public/screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="380"></td>
-      <td><img src="FRONTEND/public/screenshots/dashboard-mobile.png" alt="Mobile Dashboard" width="120"></td>
-      <td><img src="FRONTEND/public/screenshots/dashboard-dark.png" alt="Dark Mode Dashboard" width="380"></td>
+      <td><img src="screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="380"></td>
+      <td><img src="screenshots/dashboard-mobile.png" alt="Mobile Dashboard" width="120"></td>
+      <td><img src="screenshots/dashboard-dark.png" alt="Dark Mode Dashboard" width="380"></td>
     </tr>
   </table>
 
@@ -43,9 +43,9 @@
       <td align="center"><strong>AI Assistant</strong></td>
     </tr>
     <tr>
-      <td><img src="FRONTEND/public/screenshots/editor-desktop.png" alt="Note Editor" width="250"></td>
-      <td><img src="FRONTEND/public/screenshots/voice-desktop.png" alt="Voice Notes" width="250"></td>
-      <td><img src="FRONTEND/public/screenshots/ai-desktop.png" alt="AI Assistant" width="250"></td>
+      <td><img src="screenshots/editor-desktop.png" alt="Note Editor" width="250"></td>
+      <td><img src="screenshots/voice-desktop.png" alt="Voice Notes" width="250"></td>
+      <td><img src="screenshots/ai-desktop.png" alt="AI Assistant" width="250"></td>
     </tr>
     <tr>
       <td align="center"><strong>Revision Calendar</strong></td>
@@ -53,8 +53,8 @@
       <td></td>
     </tr>
     <tr>
-      <td><img src="FRONTEND/public/screenshots/revision-desktop.png" alt="Revision Calendar" width="250"></td>
-      <td><img src="FRONTEND/public/screenshots/profile-desktop.png" alt="Profile" width="250"></td>
+      <td><img src="screenshots/revision-desktop.png" alt="Revision Calendar" width="250"></td>
+      <td><img src="screenshots/profile-desktop.png" alt="Profile" width="250"></td>
       <td></td>
     </tr>
   </table>
