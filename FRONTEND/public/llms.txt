@@ -1,0 +1,18 @@
+# StudySnap
+
+StudySnap is a high-performance web application designed to help students capture, structure, listen to, and revise notes using artificial intelligence.
+
+## Docs
+
+- https://studysnap.vercel.app/
+- GitHub: https://github.com/surajkumar/studysnap
+
+## Features
+
+- Note taking with auto-save and rich text
+- Voice notes with transcription
+- Text-to-speech for any note
+- AI chat, summarization, MCQs, flashcards, translation
+- Spaced repetition revision system
+- PWA offline support
+- Dark mode

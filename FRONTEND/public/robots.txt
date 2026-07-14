@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://studysnap.vercel.app/sitemap.xml
