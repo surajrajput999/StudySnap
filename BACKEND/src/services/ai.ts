@@ -16,7 +16,7 @@ export async function chatCompletion(messages: { role: string; content: string }
     return mockChatReply(messages);
   }
   const response = await groq.chat.completions.create({
-    model: 'llama3-8b-8192',
+    model: 'llama-3.1-8b-instant',
     messages: [
       {
         role: 'system',
@@ -35,7 +35,7 @@ export async function summarizeNote(title: string, content: string) {
     return mockSummary(title);
   }
   const response = await groq.chat.completions.create({
-    model: 'llama3-8b-8192',
+    model: 'llama-3.1-8b-instant',
     messages: [
       {
         role: 'system',
@@ -53,7 +53,7 @@ export async function generateMcqs(title: string, content: string) {
     return mockMcqs();
   }
   const response = await groq.chat.completions.create({
-    model: 'llama3-8b-8192',
+    model: 'llama-3.1-8b-instant',
     messages: [
       {
         role: 'system',
@@ -73,7 +73,7 @@ export async function generateFlashcards(title: string, content: string) {
     return mockFlashcards();
   }
   const response = await groq.chat.completions.create({
-    model: 'llama3-8b-8192',
+    model: 'llama-3.1-8b-instant',
     messages: [
       {
         role: 'system',
@@ -94,7 +94,7 @@ export async function translateText(content: string, lang: 'hindi' | 'english') 
   }
   const label = lang === 'hindi' ? 'Hindi' : 'English';
   const response = await groq.chat.completions.create({
-    model: 'llama3-8b-8192',
+    model: 'llama-3.1-8b-instant',
     messages: [
       {
         role: 'system',
