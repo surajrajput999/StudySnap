@@ -18,6 +18,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/', apiLimiter);
 
+app.get('/favicon.ico', (_req, res) => res.status(204).end());
+
 app.get('/api/health', (_req, res) => {
   res.json({
     success: true,
