@@ -25,15 +25,4 @@ router.post('/clerk', async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
-router.post('/razorpay', async (req: Request, res: Response) => {
-  try {
-    const event = req.body;
-    console.log('[Webhook] Razorpay event:', event.event);
-    res.json({ success: true });
-  } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
 export default router;

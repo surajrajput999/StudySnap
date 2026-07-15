@@ -8,7 +8,6 @@ import notesRouter from './routes/notes';
 import voiceNotesRouter from './routes/voiceNotes';
 import aiRouter from './routes/ai';
 import revisionRouter from './routes/revision';
-import paymentsRouter from './routes/payments';
 import webhooksRouter from './routes/webhooks';
 
 const app = express();
@@ -32,7 +31,6 @@ app.get('/api/health', (_req, res) => {
       clerk: !!env.CLERK_SECRET_KEY ? 'configured' : 'mock mode',
       cloudinary: !!env.CLOUDINARY_CLOUD_NAME ? 'configured' : 'not configured',
       email: !!env.BREVO_API_KEY ? 'configured' : 'not configured',
-      payments: !!env.RAZORPAY_KEY_ID ? 'configured' : 'not configured',
     },
   });
 });
@@ -41,7 +39,6 @@ app.use('/api/notes', notesRouter);
 app.use('/api/voice-notes', voiceNotesRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/revision', revisionRouter);
-app.use('/api/payments', paymentsRouter);
 app.use('/api/webhooks', webhooksRouter);
 
 app.use((_req, res) => {

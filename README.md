@@ -145,9 +145,8 @@ npm run dev
 | **Auth** | Clerk (Sign In / User Button) |
 | **AI** | Groq (LLaMA-3 70B) |
 | **Cache** | Upstash Redis |
-| **Storage** | Cloudinary (images), Backblaze B2 (files) |
+| **Storage** | Cloudinary |
 | **Email** | Brevo |
-| **Payments** | Razorpay |
 | **Queue** | BullMQ |
 | **Security** | Helmet, CORS, Rate Limiting, csurf |
 | **PWA** | Web Manifest, Service Worker |
