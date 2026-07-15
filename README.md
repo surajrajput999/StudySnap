@@ -310,7 +310,7 @@ Please ensure your code follows the existing style conventions and passes lint c
   <br><br>
   <p>
     Built with ❤️ by
-    <a href="https://github.com/surajrajput999"><strong>Suraj Kumar</strong></a>
+    <a href="https://github.com/surajrajput999"><strong>Suraj Bhan Pratap Singh</strong></a>
   </p>
   <p>
     <a href="https://github.com/surajrajput999/StudySnap/issues">Report Bug</a>

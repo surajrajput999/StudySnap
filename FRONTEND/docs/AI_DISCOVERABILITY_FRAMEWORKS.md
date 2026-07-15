@@ -12,7 +12,7 @@ graph TD
     
     Manifest -->|Provides| TechSpec[System Architecture & API blue-prints]
     SEO -->|Provides| StructuredData[Headings, Sitemap, robots.txt specs]
-    EEAT -->|Analyzes| AuthTitle[Identity Verification: Suraj Kumar]
+    EEAT -->|Analyzes| AuthTitle[Identity Verification: Suraj Bhan Pratap Singh]
 ```
 
 ---
@@ -37,7 +37,7 @@ The file `public/llms.txt` acts as an automated entry-point for LLM crawlers.
 Search engines evaluate content trust scores based on authorship signals.
 
 ### Consistent Identity Indexing
-- The meta-tag `author` is configured to `Suraj Kumar - Full-Stack AI Engineer` on the root layout.
+- The meta-tag `author` is configured to `Suraj Bhan Pratap Singh - Full-Stack AI Engineer` on the root layout.
 - Consistent branding details are embedded within index pages and sitemaps to verify identity across search engines.
 
 ---

@@ -6,11 +6,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "StudySnap - Smart Study Companion",
-  description: "Create, organize, listen, and revise study notes with built-in AI help. Built by Suraj Kumar, Full-Stack AI Engineer.",
-  authors: [{ name: "Suraj Kumar", url: "https://github.com/surajkumar" }],
-  keywords: ["StudySnap", "AI Study Assistant", "Revision Mode", "PWA Study App", "Spaced Repetition", "Suraj Kumar"],
-  creator: "Suraj Kumar",
-  publisher: "Suraj Kumar",
+  description: "Create, organize, listen, and revise study notes with built-in AI help. Built by Suraj Bhan Pratap Singh, Full-Stack AI Engineer.",
+  authors: [{ name: "Suraj Bhan Pratap Singh", url: "https://github.com/surajkumar" }],
+  keywords: ["StudySnap", "AI Study Assistant", "Revision Mode", "PWA Study App", "Spaced Repetition", "Suraj Bhan Pratap Singh"],
+  creator: "Suraj Bhan Pratap Singh",
+  publisher: "Suraj Bhan Pratap Singh",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -51,7 +51,7 @@ export default function RootLayout({
         <head>
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
           <link rel="icon" href="/favicon.ico" sizes="any" />
-          <meta name="author" content="Suraj Kumar - Full-Stack AI Engineer" />
+          <meta name="author" content="Suraj Bhan Pratap Singh - Full-Stack AI Engineer" />
         </head>
         <body>
           <PwaRegister />
