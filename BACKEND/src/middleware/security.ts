@@ -7,8 +7,14 @@ export const securityMiddleware = helmet({
   crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
 });
 
+const allowedOrigins = [
+  env.FRONTEND_URL,
+  'http://localhost:3000',
+  'https://studysnap-sigma.vercel.app',
+].filter(Boolean);
+
 export const corsMiddleware = cors({
-  origin: [env.FRONTEND_URL, 'http://localhost:3000'].filter(Boolean),
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
