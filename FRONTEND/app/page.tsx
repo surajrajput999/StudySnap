@@ -26,6 +26,8 @@ export default function Page() {
   useEffect(() => {
     if (isSignedIn && clerkUser?.fullName) {
       updateProfile({ name: clerkUser.fullName });
+    } else if (!isSignedIn) {
+      updateProfile({ name: 'Student' });
     }
   }, [isSignedIn, clerkUser]);
 
