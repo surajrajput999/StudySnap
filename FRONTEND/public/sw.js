@@ -12,7 +12,7 @@ const ASSETS_TO_CACHE = [
   '/file.svg'
 ];
 
-self.addEventListener('install', (event: any) => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
@@ -21,7 +21,7 @@ self.addEventListener('install', (event: any) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event: any) => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
@@ -36,8 +36,7 @@ self.addEventListener('activate', (event: any) => {
   self.clients.claim();
 });
 
-self.addEventListener('fetch', (event: any) => {
-  // Only cache GET requests and avoid caching third-party or chrome-extension URLs
+self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
     return;
   }
@@ -45,16 +44,13 @@ self.addEventListener('fetch', (event: any) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch fresh in background and update cache (Stale-While-Revalidate)
         fetch(event.request)
           .then((response) => {
             if (response.status === 200) {
               caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response));
             }
           })
-          .catch(() => {
-            // Ignore background fetch error
-          });
+          .catch(() => {});
         return cachedResponse;
       }
 
@@ -67,7 +63,6 @@ self.addEventListener('fetch', (event: any) => {
           return response;
         })
         .catch(async () => {
-          // If offline and request is HTML, return cached root as fallback
           if (event.request.headers.get('accept')?.includes('text/html')) {
             const cachedRoot = await caches.match('/');
             if (cachedRoot) return cachedRoot;
