@@ -75,7 +75,7 @@ export default function Page() {
           maxWidth: '1200px', margin: '0 auto', padding: '10px 24px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>
-          <div 
+          <div className="header-logo"
             onClick={() => setActiveTab('home')}
             style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
           >
@@ -85,13 +85,13 @@ export default function Page() {
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {isOffline ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 600, color: 'var(--error)', padding: '4px 12px', borderRadius: '100px', background: 'var(--error-container)' }}>
+              <span className="status-badge" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 600, color: 'var(--error)', padding: '4px 12px', borderRadius: '100px', background: 'var(--error-container)' }}>
                 <WifiOff size={13} /> Offline
               </span>
             ) : (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 600, color: '#10B981', padding: '4px 12px', borderRadius: '100px', background: 'rgba(16,185,129,0.1)' }}>
+              <span className="status-badge" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 600, color: '#10B981', padding: '4px 12px', borderRadius: '100px', background: 'rgba(16,185,129,0.1)' }}>
                 <Wifi size={13} /> Online
               </span>
             )}
@@ -105,7 +105,7 @@ export default function Page() {
             ) : (
               <SignInButton mode="modal" forceRedirectUrl="/" signUpForceRedirectUrl="/">
                 <button className="md3-btn md3-btn-primary" style={{ padding: '8px 18px', fontSize: '13px' }}>
-                  <LogIn size={14} /> Sign In
+                  <LogIn size={14} /> <span className="sign-in-text">Sign In</span>
                 </button>
               </SignInButton>
             )}
@@ -231,6 +231,13 @@ export default function Page() {
           .desktop-nav { display: none !important; }
           .mobile-nav { display: flex !important; }
           main { padding: 16px !important; }
+          .header-logo span { display: none !important; }
+          .status-badge { display: none !important; }
+        }
+        @media (max-width: 400px) {
+          header > div { padding: 8px 12px !important; }
+          .header-right { gap: 6px !important; }
+          .sign-in-text { display: none !important; }
         }
         @media (min-width: 769px) {
           .desktop-nav { display: flex !important; }

@@ -3,12 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore, Note } from '@/lib/store/useStore';
 import { API, apiFetch } from '@/lib/config';
+import { useAuth } from '@clerk/nextjs';
 import { 
   Send, Sparkles, AlertCircle, HelpCircle, Languages, LayoutGrid, FileText
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function AiHelper() {
+  const { getToken } = useAuth();
   const { notes, activeNoteId } = useStore();
   const activeNote = notes.find(n => n.id === activeNoteId);
 
@@ -48,7 +50,7 @@ export default function AiHelper() {
     setChatInput('');
     setIsChatLoading(true);
     try {
-      const data = await apiFetch(API.ai.chat, { method: 'POST', body: JSON.stringify({ messages: updatedMessages }) });
+      const data = await apiFetch(API.ai.chat, { method: 'POST', body: JSON.stringify({ messages: updatedMessages }), token: await getToken() });
       if (data.success) setChatMessages([...updatedMessages, data.message]);
       else throw new Error(data.error);
     } catch (err: any) {
@@ -61,7 +63,7 @@ export default function AiHelper() {
     setIsSummarizing(true);
     setSummary('');
     try {
-      const data = await apiFetch(API.ai.summarize, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content }) });
+      const data = await apiFetch(API.ai.summarize, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content }), token: await getToken() });
       if (data.success) { setSummary(data.summary); confetti({ particleCount: 30, colors: ['#0061A4'] }); }
       else throw new Error(data.error);
     } catch (err: any) { setSummary(`Error: ${err.message}`); }
@@ -75,7 +77,7 @@ export default function AiHelper() {
     setSelectedAnswers({});
     setShowExplanation({});
     try {
-      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'mcq' }) });
+      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'mcq' }), token: await getToken() });
       if (data.success) { setMcqs(data.mcqs); confetti({ particleCount: 40, colors: ['#10B981', '#3B82F6'] }); }
       else throw new Error(data.error);
     } catch (err: any) { alert(`Failed: ${err.message}`); }
@@ -88,7 +90,7 @@ export default function AiHelper() {
     setFlashcards([]);
     setFlippedCards({});
     try {
-      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'flashcard' }) });
+      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'flashcard' }), token: await getToken() });
       if (data.success) { setFlashcards(data.flashcards); confetti({ particleCount: 40, colors: ['#EC4899'] }); }
       else throw new Error(data.error);
     } catch (err: any) { alert(`Failed: ${err.message}`); }
@@ -100,7 +102,7 @@ export default function AiHelper() {
     setIsTranslating(true);
     setTranslatedText('');
     try {
-      const data = await apiFetch(API.ai.translate, { method: 'POST', body: JSON.stringify({ content: activeNote.content, targetLanguage: lang }) });
+      const data = await apiFetch(API.ai.translate, { method: 'POST', body: JSON.stringify({ content: activeNote.content, targetLanguage: lang }), token: await getToken() });
       if (data.success) { setTranslatedText(data.translatedText); confetti({ particleCount: 30, colors: ['#8B5CF6'] }); }
       else throw new Error(data.error);
     } catch (err: any) { setTranslatedText(`Translation failed: ${err.message}`); }

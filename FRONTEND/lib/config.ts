@@ -24,15 +24,17 @@ export const API = {
 
 export async function apiFetch<T = any>(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit & { token?: string } = {}
 ): Promise<T> {
   try {
+    const { token, ...fetchOptions } = options;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
+      headers: { ...headers, ...(fetchOptions.headers as Record<string, string> || {}) },
+      ...fetchOptions,
     });
     const json = await res.json();
     return json;
