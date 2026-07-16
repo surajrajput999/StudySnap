@@ -180,12 +180,39 @@ export default function AiTutor() {
         throw new Error(data.error || 'Failed to get response');
       }
     } catch (err: any) {
+      const msg = err?.message || 'Could not reach AI. Please try again.';
+      const isNetworkError = msg.includes('fetch') || msg.includes('NetworkError') || msg.includes('network') || msg.includes('ERR_CONNECTION');
+      const isCorsError = msg.includes('CORS') || msg.includes('cross-origin');
+      const isTimeout = msg.includes('timeout') || msg.includes('timed out');
+
+      let userMessage: string;
+      if (isNetworkError) {
+        userMessage = `🔴 **Connection Error** — The AI server is unreachable.\n\n` +
+          `Your browser tried to reach:\n\`\`\`\n${API.ai.chat}\n\`\`\`\n\n` +
+          `**Fixes:**\n` +
+          `1. Make sure the backend server is running on Render\n` +
+          `2. Set \`NEXT_PUBLIC_BACKEND_URL\` in Vercel to your Render backend URL\n` +
+          `3. Set \`FRONTEND_URL\` in Render to your Vercel frontend URL\n\n` +
+          `_Error: ${msg}_`;
+      } else if (isCorsError) {
+        userMessage = `🔴 **CORS Error** — Your frontend URL isn't allowed by the backend.\n\n` +
+          `**Fix:** Add \`${typeof window !== 'undefined' ? window.location.origin : 'your-frontend-url'}\` ` +
+          `to the \`allowedOrigins\` array in \`BACKEND/src/middleware/security.ts\`.\n\n` +
+          `_Error: ${msg}_`;
+      } else if (isTimeout) {
+        userMessage = `⏱️ **Request Timeout** — The AI took too long to respond.\n\n` +
+          `Try asking a shorter or simpler question. The Groq model may be under load.\n\n` +
+          `_Error: ${msg}_`;
+      } else {
+        userMessage = `⚠️ **Error:** ${msg}\n\nPlease try again or rephrase your question.`;
+      }
+
       addStreamingMessage('');
       setTimeout(() => {
         setMessages(prev => {
           const last = prev[prev.length - 1];
           if (last?.isStreaming) {
-            return [...prev.slice(0, -1), { role: 'assistant', content: `⚠️ Error: ${err.message || 'Could not reach AI. Please try again.'}`, isStreaming: false }];
+            return [...prev.slice(0, -1), { role: 'assistant', content: userMessage, isStreaming: false }];
           }
           return prev;
         });

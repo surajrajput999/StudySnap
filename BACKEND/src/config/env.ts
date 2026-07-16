@@ -1,9 +1,20 @@
 import 'dotenv/config';
 
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const isDev = NODE_ENV === 'development';
+const isProd = NODE_ENV === 'production';
+
+if (!process.env.FRONTEND_URL && isProd) {
+  console.warn('[env] ⚠️ FRONTEND_URL not set in production. Set it to your Vercel frontend URL.');
+}
+if (!process.env.GROQ_API_KEY && isProd) {
+  console.warn('[env] ⚠️ GROQ_API_KEY not set in production. AI will return mock responses.');
+}
+
 export const env = {
   PORT: parseInt(process.env.PORT || '4000', 10),
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  NODE_ENV,
+  FRONTEND_URL: process.env.FRONTEND_URL || (isDev ? 'http://localhost:3000' : ''),
 
   DATABASE_URL: process.env.DATABASE_URL || '',
 
@@ -22,6 +33,6 @@ export const env = {
   BREVO_API_KEY: process.env.BREVO_API_KEY || '',
   BREVO_SENDER_EMAIL: process.env.BREVO_SENDER_EMAIL || 'study@notes.ai',
 
-  isDev: () => env.NODE_ENV === 'development',
-  isProd: () => env.NODE_ENV === 'production',
+  isDev: () => isDev,
+  isProd: () => isProd,
 };

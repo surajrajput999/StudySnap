@@ -5,6 +5,9 @@ let groq: any = null;
 
 if (env.GROQ_API_KEY) {
   groq = new Groq({ apiKey: env.GROQ_API_KEY });
+  console.log('[ai] ✅ Groq SDK initialized with live API key');
+} else {
+  console.warn('[ai] ⚠️ GROQ_API_KEY not set — AI will return mock responses');
 }
 
 export function getGroq() {
@@ -13,98 +16,139 @@ export function getGroq() {
 
 export async function chatCompletion(messages: { role: string; content: string }[]) {
   if (!groq) {
+    console.log('[ai] mock → chatCompletion');
     return mockChatReply(messages);
   }
-  const response = await groq.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [
-      {
-        role: 'system',
-        content: 'You are StudyBot, an AI study assistant for students. Explain topics simply, offer study tips, and draft revision schedules. Keep responses concise in Markdown.'
-      },
-      ...messages
-    ],
-    temperature: 0.7,
-    max_tokens: 1024,
-  });
-  return response.choices[0]?.message?.content || 'Sorry, I could not process that.';
+  try {
+    console.log('[ai] groq → chatCompletion', { messages: messages.length });
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are StudyBot, an AI study assistant for students. Explain topics simply, offer study tips, and draft revision schedules. Keep responses concise in Markdown.'
+        },
+        ...messages
+      ],
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
+    const content = response.choices[0]?.message?.content;
+    if (!content) throw new Error('Groq returned empty response');
+    console.log(`[ai] groq → chatCompletion ✓ ${content.length} chars`);
+    return content;
+  } catch (error: any) {
+    console.error('[ai] groq → chatCompletion ❌', {
+      message: error?.message,
+      status: error?.status,
+    });
+    throw new Error(error?.message || 'Groq AI request failed');
+  }
 }
 
 export async function summarizeNote(title: string, content: string) {
   if (!groq) {
+    console.log('[ai] mock → summarizeNote');
     return mockSummary(title);
   }
-  const response = await groq.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [
-      {
-        role: 'system',
-        content: 'You are an expert summarizer. Generate a concise, structured, bulleted summary. Highlight key definitions, formulas, and main points. Use Markdown.'
-      },
-      { role: 'user', content: `Title: ${title}\n\nContent:\n${content}` }
-    ],
-    temperature: 0.3,
-  });
-  return response.choices[0]?.message?.content || 'Could not generate summary.';
+  try {
+    console.log('[ai] groq → summarizeNote', { title: title.substring(0, 40), contentLength: content.length });
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert summarizer. Generate a concise, structured, bulleted summary. Highlight key definitions, formulas, and main points. Use Markdown.'
+        },
+        { role: 'user', content: `Title: ${title}\n\nContent:\n${content}` }
+      ],
+      temperature: 0.3,
+    });
+    return response.choices[0]?.message?.content || 'Could not generate summary.';
+  } catch (error: any) {
+    console.error('[ai] groq → summarizeNote ❌', error?.message);
+    throw new Error(error?.message || 'Summary generation failed');
+  }
 }
 
 export async function generateMcqs(title: string, content: string) {
   if (!groq) {
+    console.log('[ai] mock → generateMcqs');
     return mockMcqs();
   }
-  const response = await groq.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [
-      {
-        role: 'system',
-        content: 'Generate exactly 3 MCQs in JSON array format. Each: {"question": "...", "options": ["","","",""], "answer": 0, "explanation": "..."}. Return ONLY valid JSON.'
-      },
-      { role: 'user', content: `Text:\n${content}` }
-    ],
-    temperature: 0.5,
-  });
-  const raw = response.choices[0]?.message?.content || '[]';
-  const match = raw.match(/\[\s*\{[\s\S]*\}\s*\]/);
-  return JSON.parse(match ? match[0] : '[]');
+  try {
+    console.log('[ai] groq → generateMcqs', { contentLength: content.length });
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: 'Generate exactly 3 MCQs in JSON array format. Each: {"question": "...", "options": ["","","",""], "answer": 0, "explanation": "..."}. Return ONLY valid JSON.'
+        },
+        { role: 'user', content: `Text:\n${content}` }
+      ],
+      temperature: 0.5,
+    });
+    const raw = response.choices[0]?.message?.content || '[]';
+    const match = raw.match(/\[\s*\{[\s\S]*\}\s*\]/);
+    return JSON.parse(match ? match[0] : '[]');
+  } catch (error: any) {
+    console.error('[ai] groq → generateMcqs ❌', error?.message);
+    throw new Error(error?.message || 'MCQ generation failed');
+  }
 }
 
 export async function generateFlashcards(title: string, content: string) {
   if (!groq) {
+    console.log('[ai] mock → generateFlashcards');
     return mockFlashcards();
   }
-  const response = await groq.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [
-      {
-        role: 'system',
-        content: 'Generate exactly 3 flashcards in JSON array format. Each: {"question": "...", "answer": "..."}. Return ONLY valid JSON.'
-      },
-      { role: 'user', content: `Text:\n${content}` }
-    ],
-    temperature: 0.5,
-  });
-  const raw = response.choices[0]?.message?.content || '[]';
-  const match = raw.match(/\[\s*\{[\s\S]*\}\s*\]/);
-  return JSON.parse(match ? match[0] : '[]');
+  try {
+    console.log('[ai] groq → generateFlashcards', { contentLength: content.length });
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: 'Generate exactly 3 flashcards in JSON array format. Each: {"question": "...", "answer": "..."}. Return ONLY valid JSON.'
+        },
+        { role: 'user', content: `Text:\n${content}` }
+      ],
+      temperature: 0.5,
+    });
+    const raw = response.choices[0]?.message?.content || '[]';
+    const match = raw.match(/\[\s*\{[\s\S]*\}\s*\]/);
+    return JSON.parse(match ? match[0] : '[]');
+  } catch (error: any) {
+    console.error('[ai] groq → generateFlashcards ❌', error?.message);
+    throw new Error(error?.message || 'Flashcard generation failed');
+  }
 }
 
 export async function translateText(content: string, lang: 'hindi' | 'english') {
   if (!groq) {
+    console.log('[ai] mock → translateText', { lang });
     return mockTranslation(content, lang);
   }
-  const label = lang === 'hindi' ? 'Hindi' : 'English';
-  const response = await groq.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [
-      {
-        role: 'system',
-        content: `Translate the text exactly into ${label}. Retain formatting. Return only the translated text.`
-      },
-      { role: 'user', content }
-    ],
-    temperature: 0.2,
-  });
-  return response.choices[0]?.message?.content || 'Translation failed.';
+  try {
+    const label = lang === 'hindi' ? 'Hindi' : 'English';
+    console.log('[ai] groq → translateText', { lang, contentLength: content.length });
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: `Translate the text exactly into ${label}. Retain formatting. Return only the translated text.`
+        },
+        { role: 'user', content }
+      ],
+      temperature: 0.2,
+    });
+    return response.choices[0]?.message?.content || 'Translation failed.';
+  } catch (error: any) {
+    console.error('[ai] groq → translateText ❌', error?.message);
+    throw new Error(error?.message || 'Translation failed');
+  }
 }
 
 function mockChatReply(messages: { role: string; content: string }[]) {

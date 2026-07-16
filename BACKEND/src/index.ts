@@ -4,6 +4,8 @@ import { securityMiddleware, corsMiddleware, csrfProtection } from './middleware
 import { apiLimiter } from './middleware/rateLimiter';
 import { env } from './config/env';
 
+console.log(`[server] Starting with NODE_ENV=${env.NODE_ENV} FRONTEND_URL=${env.FRONTEND_URL || '(not set)'} GROQ_API_KEY=${env.GROQ_API_KEY ? '***present***' : '(not set)'}`);
+
 import notesRouter from './routes/notes';
 import voiceNotesRouter from './routes/voiceNotes';
 import aiRouter from './routes/ai';
@@ -21,11 +23,17 @@ app.use('/api/', apiLimiter);
 app.get('/favicon.ico', (_req, res) => res.status(204).end());
 
 app.get('/api/health', (_req, res) => {
+  const origin = _req.headers.origin || _req.headers.host || 'unknown';
+  console.log(`[health] ✓ from origin="${origin}" — AI=${!!env.GROQ_API_KEY} CORS_FE=${env.FRONTEND_URL || 'not set'}`);
   res.json({
     success: true,
     status: 'healthy',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
+    env: {
+      NODE_ENV: env.NODE_ENV,
+      FRONTEND_URL: env.FRONTEND_URL || '(not set)',
+    },
     services: {
       database: !!env.DATABASE_URL ? 'configured' : 'not configured',
       ai: !!env.GROQ_API_KEY ? 'configured' : 'mock mode',

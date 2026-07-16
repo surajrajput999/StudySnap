@@ -1,4 +1,29 @@
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+const isBrowser = typeof window !== 'undefined';
+
+function detectBackendURL(): string {
+  if (process.env.NEXT_PUBLIC_BACKEND_URL) {
+    return process.env.NEXT_PUBLIC_BACKEND_URL;
+  }
+  if (isBrowser) {
+    const host = window.location.hostname;
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      const fallback = `https://${host.replace('frontend', 'api').replace('app', 'api')}`;
+      console.warn(`[config] NEXT_PUBLIC_BACKEND_URL not set — guessing backend at ${fallback}. Set this environment variable in Vercel.`);
+      return fallback;
+    }
+  }
+  return 'http://localhost:4000';
+}
+
+const BACKEND_URL = detectBackendURL();
+
+if (typeof window !== 'undefined' && BACKEND_URL.includes('localhost') && window.location.hostname !== 'localhost') {
+  console.error(
+    `[config] ⚠️ BACKEND_URL is "${BACKEND_URL}" but frontend is deployed at "${window.location.hostname}".\n` +
+    '  → Set NEXT_PUBLIC_BACKEND_URL in Vercel dashboard to your Render backend URL.\n' +
+    '  → Example: https://studysnap-api.onrender.com'
+  );
+}
 
 export const API = {
   base: BACKEND_URL,
@@ -26,19 +51,42 @@ export async function apiFetch<T = any>(
   url: string,
   options: RequestInit & { token?: string } = {}
 ): Promise<T> {
+  const { token, ...fetchOptions } = options;
+  const startTime = performance.now();
+
   try {
-    const { token, ...fetchOptions } = options;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    console.log(`[apiFetch] → ${options.method || 'GET'} ${url}`);
+
     const res = await fetch(url, {
       headers: { ...headers, ...(fetchOptions.headers as Record<string, string> || {}) },
       ...fetchOptions,
     });
+
+    const duration = Math.round(performance.now() - startTime);
     const json = await res.json();
+
+    if (!res.ok) {
+      console.error(`[apiFetch] ✗ ${res.status} ${url} (${duration}ms):`, json);
+    } else {
+      console.log(`[apiFetch] ✓ ${url} (${duration}ms)`);
+    }
+
     return json;
   } catch (error: any) {
-    return { success: false, error: error.message || 'Network error' } as T;
+    const duration = Math.round(performance.now() - startTime);
+    const msg = error?.message || 'Unknown network error';
+    console.error(`[apiFetch] ✗ NETWORK ERROR ${url} (${duration}ms): ${msg}`);
+
+    if (url.includes('localhost') && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      console.error('[apiFetch] ⚠️ Request to localhost from deployed frontend will always fail.');
+      console.error('[apiFetch] → Set NEXT_PUBLIC_BACKEND_URL in Vercel to production backend URL.');
+    }
+
+    return { success: false, error: msg, _debug: { url, duration } } as T;
   }
 }
