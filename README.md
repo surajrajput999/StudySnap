@@ -42,28 +42,69 @@
   <img src="https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
 </p>
 
+---
 
+## 📸 Screenshots
 
+### 🖥 Desktop Experience
 
+<p align="center">
+  <img src="public/screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>Main dashboard — notes grid, study stats, and quick actions</em>
+</p>
 
+<br>
 
+<p align="center">
+  <img src="public/screenshots/note-editor.png" alt="Note Editor" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>Rich text editor with auto-save, speech-to-text, and PIN lock</em>
+</p>
 
+<br>
 
+<p align="center">
+  <img src="public/screenshots/ai-assistant.png" alt="AI Assistant" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>SnapAI chat — summarization, quizzes, flashcards, translation</em>
+</p>
 
+<br>
 
- 
+<p align="center">
+  <img src="public/screenshots/voice-notes.png" alt="Voice Notes" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>Audio recorder with variable speed playback and live transcription</em>
+</p>
 
+<br>
 
+<p align="center">
+  <img src="public/screenshots/revision-calendar.png" alt="Revision Calendar" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>Spaced repetition scheduler with streaks and difficulty ratings</em>
+</p>
 
+<br>
 
+<p align="center">
+  <img src="public/screenshots/profile-dashboard.png" alt="Student Profile" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>Profile dashboard — XP, study zones, goals and achievements</em>
+</p>
 
+<br>
 
+<p align="center">
+  <img src="public/screenshots/dark-dashboard.png" alt="Dark Mode" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>Full dark theme with MD3 elevation and glassmorphism</em>
+</p>
 
+---
 
+### 📱 Mobile Experience
 
+<p align="center">
+  <img src="public/screenshots/mobile-dashboard.png" alt="Mobile Dashboard" width="320" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <br><em>Native mobile UI with bottom navigation and MD3 drawer</em>
+</p>
 
-
-
+---
 
 ## 🚀 Features
 
