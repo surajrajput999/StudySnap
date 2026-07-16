@@ -425,7 +425,7 @@ export default function HomeScreen({ onEditNote, onCreateNote, onNavigate }: Hom
       </div>
 
       {/* ─── Search + Filters ─── */}
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div className="search-filters-row">
         <div style={{ position: 'relative', flex: '1 1 280px', minWidth: '200px' }}>
           <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)', pointerEvents: 'none' }} />
           <input
@@ -452,7 +452,7 @@ export default function HomeScreen({ onEditNote, onCreateNote, onNavigate }: Hom
             <Plus size={14} /> Add Subject
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+        <div className="categories-scroll" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
           <button onClick={() => setActiveCategoryId(null)}
             style={{ padding: '7px 16px', borderRadius: '100px', border: 'none', fontSize: '12px', fontWeight: 600, cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s',
               background: activeCategoryId === null ? 'var(--primary)' : 'var(--surface)', color: activeCategoryId === null ? 'var(--on-primary)' : 'var(--on-surface)',
@@ -485,7 +485,7 @@ export default function HomeScreen({ onEditNote, onCreateNote, onNavigate }: Hom
             <Plus size={14} /> New Folder
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+        <div className="folders-scroll" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
           <button onClick={() => setActiveFolderId(null)}
             style={{ padding: '7px 16px', borderRadius: '12px', border: 'none', fontSize: '12px', fontWeight: 600, cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s',
               background: activeFolderId === null ? 'var(--primary)' : 'var(--surface)', color: activeFolderId === null ? 'var(--on-primary)' : 'var(--on-surface)',
@@ -532,7 +532,7 @@ export default function HomeScreen({ onEditNote, onCreateNote, onNavigate }: Hom
               tip="Organize notes with subjects, folders, and tags for easy retrieval."
             />
           ) : viewMode === 'grid' ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+            <div className="notes-grid" style={{ gap: '16px' }}>
               {displayNotes.map((note) => {
                 const noteCategory = categories.find(c => c.id === note.categoryId);
                 return (
