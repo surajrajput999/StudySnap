@@ -44,26 +44,85 @@
 
 ---
 
-## ✨ Demo
+## 📸 Screenshots
+
+### 🖥 Desktop Dashboard
 
 <p align="center">
-  <img src="screenshots/dashboard-desktop.png" alt="StudySnap Demo" width="800" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+  <img src="public/screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
 </p>
+
+The main dashboard with personalized greeting, streak tracker, study goals, and quick-access notes.
 
 ---
 
-## 📸 Screenshot Gallery
+### 📱 Mobile Dashboard
 
 <p align="center">
-  <img src="screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="49%" style="border-radius: 8px;">
-  <img src="screenshots/dashboard-dark.png" alt="Dark Mode" width="49%" style="border-radius: 8px;">
+  <img src="public/screenshots/dashboard-mobile.png" alt="Mobile Dashboard" width="300" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
 </p>
 
+Native mobile experience with bottom navigation and MD3 drawer.
+
+---
+
+### 🌙 Dark Mode
+
 <p align="center">
-  <img src="screenshots/ai-desktop.png" alt="AI Assistant" width="32%" style="border-radius: 8px;">
-  <img src="screenshots/editor-desktop.png" alt="Note Editor" width="32%" style="border-radius: 8px;">
-  <img src="screenshots/dashboard-mobile.png" alt="Mobile View" width="32%" style="border-radius: 8px;">
+  <img src="public/screenshots/dark-mode.png" alt="Dark Mode" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
 </p>
+
+Full dark theme with optimized contrast and reduced eye strain.
+
+---
+
+### 🤖 AI Assistant
+
+<p align="center">
+  <img src="public/screenshots/ai-assistant.png" alt="AI Assistant" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+</p>
+
+Chat with Groq LLaMA-3.1 — ask questions, summarize notes, generate quizzes, and more.
+
+---
+
+### 📝 Smart Note Editor
+
+<p align="center">
+  <img src="public/screenshots/note-editor.png" alt="Note Editor" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+</p>
+
+Rich text editing with auto-save, text-to-speech, speech-to-text, PIN lock, and PDF export.
+
+---
+
+### 🎤 Voice Notes
+
+<p align="center">
+  <img src="public/screenshots/voice-notes.png" alt="Voice Notes" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+</p>
+
+Record audio with pause/resume, variable playback speed, and real-time transcription.
+
+---
+
+### 📅 Revision Calendar
+
+<p align="center">
+  <img src="public/screenshots/revision-calendar.png" alt="Revision Calendar" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+</p>
+
+Spaced repetition scheduler with Easy/Medium/Hard ratings and visual progress tracking.
+
+---
+
+### 👤 Student Profile
+
+<p align="center">
+  <img src="public/screenshots/profile.png" alt="Student Profile" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+</p>
+
+Customizable profile with stats dashboard, study goals, and interactive study zones map.
 
 ---
 
