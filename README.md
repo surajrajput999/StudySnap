@@ -42,105 +42,28 @@
   <img src="https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
 </p>
 
----
 
 
 
 
 
----
 
-<p align="center">
-  <strong>Dashboard</strong><br>
-  <em>Modern productivity dashboard with AI-powered study tools.</em>
-</p>
 
-<p align="center">
-  <img src="public/screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
 
-<br>
 
-<p align="center">
-  <strong>Smart Note Editor</strong><br>
-  <em>Rich text editing with auto-save, speech-to-text, and PIN lock security.</em>
-</p>
+ 
 
-<p align="center">
-  <img src="public/screenshots/note-editor.png" alt="Note Editor" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
 
-<br>
 
-<p align="center">
-  <strong>AI Assistant</strong><br>
-  <em>Chat with Groq LLaMA-3.1 — summarize, quiz, translate, and more.</em>
-</p>
 
-<p align="center">
-  <img src="public/screenshots/ai-assistant.png" alt="AI Assistant" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
 
-<br>
 
-<p align="center">
-  <strong>Voice Notes</strong><br>
-  <em>Record audio with pause/resume, variable speed, and real-time transcription.</em>
-</p>
 
-<p align="center">
-  <img src="public/screenshots/voice-notes.png" alt="Voice Notes" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
 
-<br>
 
-<p align="center">
-  <strong>Revision Calendar</strong><br>
-  <em>Spaced repetition scheduler with Easy/Medium/Hard ratings and progress tracking.</em>
-</p>
 
-<p align="center">
-  <img src="public/screenshots/revision-calendar.png" alt="Revision Calendar" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
 
-<br>
 
-<p align="center">
-  <strong>Student Profile</strong><br>
-  <em>Customizable profile with stats, study goals, and interactive study zones map.</em>
-</p>
-
-<p align="center">
-  <img src="public/screenshots/profile-dashboard.png" alt="Student Profile" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
-
-<br>
-
-<p align="center">
-  <strong>Dark Mode</strong><br>
-  <em>Full dark theme with optimized contrast and reduced eye strain.</em>
-</p>
-
-<p align="center">
-  <img src="public/screenshots/dark-dashboard.png" alt="Dark Mode" width="900" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
-
----
-
-### 📱 Mobile Experience
-
-<br>
-
-<p align="center">
-  <strong>Mobile Dashboard</strong><br>
-  <em>Native mobile interface with bottom navigation and MD3 drawer.</em>
-</p>
-
-<p align="center">
-  <img src="public/screenshots/mobile-dashboard.png" alt="Mobile Dashboard" width="320" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-</p>
-
----
 
 ## 🚀 Features
 
