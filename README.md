@@ -389,10 +389,10 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
   <a href="https://github.com/surajrajput999">
     <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
   </a>
-  <a href="https://www.linkedin.com/in/suraj-bhan-pratap-singh-913a67267/">
+  <a href="https://www.linkedin.com/in/suraj-bhan-pratap-singh-891727293/">
     <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
   </a>
-  <a href="https://surajkumar.vercel.app/">
+  <a href="https://surajbhan-15.vercel.app/">
     <img src="https://img.shields.io/badge/Portfolio-0061A4?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio">
   </a>
 </p>
