@@ -9,9 +9,10 @@ import AiTutor from '@/components/AiTutor';
 import RevisionCalendar from '@/components/RevisionCalendar';
 import ProfileView from '@/components/ProfileView';
 import GamificationHub from '@/components/GamificationHub';
+import MobileDrawer from '@/components/MobileDrawer';
 import { 
   Home, FileText, Mic, Calendar, Sparkles, User, Sun, Moon, 
-  LogIn, Wifi, WifiOff, ChevronRight, Trophy
+  LogIn, Wifi, WifiOff, ChevronRight, Trophy, Menu
 } from 'lucide-react';
 import { SignInButton, UserButton, useAuth, useUser } from '@clerk/nextjs';
 
@@ -21,6 +22,7 @@ export default function Page() {
   const { user: clerkUser } = useUser();
   const [activeTab, setActiveTab] = useState<string>('home');
   const [mounted, setMounted] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -47,6 +49,17 @@ export default function Page() {
     setActiveTab('editor');
   };
 
+  const handleDrawerNav = (tab: string) => {
+    const routing: Record<string, string> = {
+      folders: 'home',
+      favorites: 'home',
+      statistics: 'profile',
+      settings: 'profile',
+      about: 'profile',
+    };
+    setActiveTab(routing[tab] || tab);
+  };
+
   const navItems = [
     { id: 'home', label: 'Dashboard', icon: Home },
     { id: 'editor', label: 'Note Editor', icon: FileText },
@@ -61,6 +74,14 @@ export default function Page() {
 
   return (
     <div className="app-root">
+      {/* ─── Mobile Drawer ─── */}
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        activeTab={activeTab}
+        onNavigate={handleDrawerNav}
+      />
+
       {/* ─── Desktop Sidebar ─── */}
       <aside className="app-sidebar">
         <div className="sidebar-brand" onClick={() => setActiveTab('home')}>
@@ -91,7 +112,7 @@ export default function Page() {
 
       {/* ─── Tablet Mini Sidebar ─── */}
       <aside className="app-rail">
-        {navItems.map((tab) => {
+        {navItems.slice(0, 6).map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
@@ -111,24 +132,16 @@ export default function Page() {
       <header className="app-header">
         <div className="header-inner">
           <div className="header-left">
-            <button className="header-mobile-menu" onClick={() => setActiveTab('home')}>
-              <img src="/window.svg" alt="StudySnap" className="header-mobile-logo" />
+            <button className="header-hamburger" onClick={() => setDrawerOpen(true)}>
+              <Menu size={22} />
             </button>
             <span className="header-title" onClick={() => setActiveTab('home')}>
+              <img src="/window.svg" alt="StudySnap" className="header-mobile-logo" />
               <span className="header-brand-text">StudySnap</span>
               <span className="header-tab-name">{navItems.find(t => t.id === activeTab)?.label}</span>
             </span>
           </div>
           <div className="header-right">
-            {isOffline ? (
-              <span className="header-badge header-badge-offline">
-                <WifiOff size={13} /> <span className="header-badge-text">Offline</span>
-              </span>
-            ) : (
-              <span className="header-badge header-badge-online">
-                <Wifi size={13} /> <span className="header-badge-text">Online</span>
-              </span>
-            )}
             <button onClick={toggleTheme} className="header-icon-btn">
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
