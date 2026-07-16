@@ -1,34 +1,138 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useStore, VoiceNote, Note } from '@/lib/store/useStore';
-import { 
-  Play, Square, Mic, MicOff, Trash2, 
-  Volume2, FileText, HelpCircle
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useStore, VoiceNote } from '@/lib/store/useStore';
+import {
+  Mic, Square, Play, Pause, Trash2, FileText, Volume2,
+  ArrowLeft, Check, X, Edit3, ChevronDown, ChevronUp
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import EmptyState, { EmptyVoiceIllustration } from './EmptyState';
 
 interface VoiceNotesProps {
   onBack: () => void;
   onLinkToNote: (noteId: string) => void;
 }
 
+const WAVEFORM_BARS = 48;
+
+function formatTime(secs: number): string {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+interface AnimatedMicProps {
+  active: boolean;
+  level?: number;
+}
+
+function AnimatedMic({ active, level = 0 }: AnimatedMicProps) {
+  const scale = active ? 0.85 + level * 0.25 : 1;
+  const color = active ? '#EF4444' : 'var(--primary)';
+
+  return (
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+      <rect x="20" y="8" width="24" height="32" rx="12" fill={color} opacity={active ? 1 : 0.15} style={{ transition: 'all 0.15s' }}>
+        <animate attributeName="opacity" values={active ? "1" : "0.15"} dur="0.3s" fill="freeze" />
+      </rect>
+      <path d="M32 44v8M26 52h12" stroke={color} strokeWidth="3" strokeLinecap="round" opacity={active ? 0.8 : 0.2} />
+      {active && (
+        <g>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <line key={i} x1={10 + i * 2} y1={28 - level * 12 * Math.sin((i * 1.2 + Date.now() * 0.005) % Math.PI)} x2={10 + i * 2} y2={28} stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" opacity={0.5 + level * 0.3}>
+              <animate attributeName="y1" values={`${28 - level * 12};${28 + level * 12};${28 - level * 12}`} dur={`${0.3 + i * 0.1}s`} repeatCount="indefinite" />
+            </line>
+          ))}
+          {[0, 1, 2, 3, 4].map((i) => (
+            <line key={`r-${i}`} x1={50 + i * 2} y1={28 - level * 12 * Math.cos((i * 1.2 + Date.now() * 0.005) % Math.PI)} x2={50 + i * 2} y2={28} stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" opacity={0.5 + level * 0.3}>
+              <animate attributeName="y1" values={`${28 - level * 12};${28 + level * 12};${28 - level * 12}`} dur={`${0.4 + i * 0.08}s`} repeatCount="indefinite" />
+            </line>
+          ))}
+        </g>
+      )}
+      <circle cx="32" cy="54" r="8" fill={color} opacity={active ? 0.12 : 0.06} />
+    </svg>
+  );
+}
+
+function WaveformBars({ levels, active, color }: { levels: number[]; active: boolean; color: string }) {
+  return (
+    <div className="waveform-container">
+      {levels.map((level, i) => (
+        <div
+          key={i}
+          className="waveform-bar"
+          style={{
+            height: `${Math.max(level * 100, 8)}%`,
+            background: color,
+            opacity: active ? 0.9 : 0.35,
+            transition: 'height 0.08s ease, opacity 0.3s',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function NoiseMeter({ level }: { level: number }) {
+  const segments = 8;
+  const filled = Math.round(level * segments);
+
+  return (
+    <div className="noise-meter">
+      <span className="noise-meter-label">Noise</span>
+      <div className="noise-meter-bars">
+        {Array.from({ length: segments }).map((_, i) => (
+          <div
+            key={i}
+            className="noise-meter-segment"
+            style={{
+              background: i < filled
+                ? i < segments * 0.5 ? '#10B981'
+                  : i < segments * 0.75 ? '#F59E0B'
+                    : '#EF4444'
+                : 'var(--outline-variant)',
+              opacity: i < filled ? 1 : 0.3,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function VoiceNotes({ onBack, onLinkToNote }: VoiceNotesProps) {
-  const { voiceNotes, notes, addVoiceNote, deleteVoiceNote } = useStore();
+  const { voiceNotes, notes, addVoiceNote, deleteVoiceNote, updateNote, addNote } = useStore();
 
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [transcript, setTranscript] = useState('');
-  
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [waveformLevels, setWaveformLevels] = useState<number[]>(new Array(WAVEFORM_BARS).fill(0.05));
+
   const [playingId, setPlayingId] = useState<string | null>(null);
-  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [playbackProgress, setPlaybackProgress] = useState(0);
+  const [playbackDuration, setPlaybackDuration] = useState(0);
+
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const durationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const recognitionRef = useRef<any>(null);
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationRef = useRef<number>(0);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -37,13 +141,13 @@ export default function VoiceNotes({ onBack, onLinkToNote }: VoiceNotesProps) {
         const rec = new SpeechRecognition();
         rec.continuous = true;
         rec.interimResults = true;
-        rec.lang = 'en-US';
+        rec.lang = 'en-IN';
         rec.onresult = (event: any) => {
           let finalTranscript = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
           }
-          if (finalTranscript) setTranscript(prev => prev + ' ' + finalTranscript);
+          if (finalTranscript) setTranscript(prev => prev + ' ' + finalTranscript.trim());
         };
         recognitionRef.current = rec;
       }
@@ -60,30 +164,69 @@ export default function VoiceNotes({ onBack, onLinkToNote }: VoiceNotesProps) {
   }, [isRecording, isPaused]);
 
   useEffect(() => {
-    return () => { if (activeAudioRef.current) activeAudioRef.current.pause(); };
+    return () => {
+      if (activeAudioRef.current) activeAudioRef.current.pause();
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      if (audioContextRef.current) audioContextRef.current.close();
+    };
   }, []);
 
-  const formatTime = (secs: number) => {
-    const m = Math.floor(secs / 60).toString().padStart(2, '0');
-    const s = (secs % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
+  const startAudioAnalysis = useCallback((stream: MediaStream) => {
+    const audioCtx = new AudioContext();
+    audioContextRef.current = audioCtx;
+    const source = audioCtx.createMediaStreamSource(stream);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 128;
+    source.connect(analyser);
+    analyserRef.current = analyser;
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    const animate = () => {
+      analyser.getByteFrequencyData(dataArray);
+      const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+      const level = Math.min(avg / 128, 1);
+      setAudioLevel(level);
+
+      const bars = new Array(WAVEFORM_BARS).fill(0);
+      for (let i = 0; i < WAVEFORM_BARS; i++) {
+        const idx = Math.floor((i / WAVEFORM_BARS) * dataArray.length);
+        bars[i] = Math.min(dataArray[idx] / 128, 1);
+      }
+      setWaveformLevels(bars);
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    animate();
+  }, []);
 
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
       audioChunksRef.current = [];
+
+      startAudioAnalysis(stream);
+
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorder.ondataavailable = (event) => { if (event.data.size > 0) audioChunksRef.current.push(event.data); };
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const audioUrl = URL.createObjectURL(audioBlob);
-        const associateNoteId = notes[0]?.id || crypto.randomUUID();
-        addVoiceNote({ noteId: associateNoteId, audioUrl, duration: recordingDuration, transcript: transcript.trim() || 'Voice session captured.' });
+        addVoiceNote({
+          noteId: '',
+          audioUrl,
+          duration: recordingDuration,
+          transcript: transcript.trim() || 'Voice note captured.',
+        });
         setRecordingDuration(0);
         setTranscript('');
+        setAudioLevel(0);
+        setWaveformLevels(new Array(WAVEFORM_BARS).fill(0.05));
+        if (animationRef.current) cancelAnimationFrame(animationRef.current);
         confetti({ particleCount: 40, colors: ['#0061A4', '#bdc7dc'] });
       };
+
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start();
       setIsRecording(true);
@@ -113,23 +256,34 @@ export default function VoiceNotes({ onBack, onLinkToNote }: VoiceNotesProps) {
   const handleStopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      streamRef.current?.getTracks().forEach(track => track.stop());
       setIsRecording(false);
       setIsPaused(false);
       if (recognitionRef.current) recognitionRef.current.stop();
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
     }
   };
 
   const handlePlayVoice = (vn: VoiceNote) => {
     if (playingId === vn.id) {
-      if (activeAudioRef.current) { activeAudioRef.current.pause(); setPlayingId(null); }
+      if (activeAudioRef.current) {
+        activeAudioRef.current.pause();
+        setPlayingId(null);
+        setPlaybackProgress(0);
+      }
     } else {
       if (activeAudioRef.current) activeAudioRef.current.pause();
       const audio = new Audio(vn.audioUrl);
       audio.playbackRate = playbackSpeed;
-      audio.onended = () => setPlayingId(null);
+      audio.onloadedmetadata = () => setPlaybackDuration(vn.duration);
+      audio.ontimeupdate = () => setPlaybackProgress(Math.floor(audio.currentTime));
+      audio.onended = () => {
+        setPlayingId(null);
+        setPlaybackProgress(0);
+      };
       activeAudioRef.current = audio;
       setPlayingId(vn.id);
+      setPlaybackProgress(0);
       audio.play();
     }
   };
@@ -139,103 +293,239 @@ export default function VoiceNotes({ onBack, onLinkToNote }: VoiceNotesProps) {
     if (activeAudioRef.current) activeAudioRef.current.playbackRate = speed;
   };
 
+  const handleSeek = (vn: VoiceNote, e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const fraction = x / rect.width;
+    const seekTime = fraction * vn.duration;
+    if (activeAudioRef.current && playingId === vn.id) {
+      activeAudioRef.current.currentTime = seekTime;
+      setPlaybackProgress(Math.floor(seekTime));
+    }
+  };
+
+  const handleRename = (vn: VoiceNote) => {
+    if (renameValue.trim() && renameValue !== vn.transcript) {
+      const linkedNote = notes.find(n => n.id === vn.noteId);
+      if (linkedNote) {
+        updateNote(linkedNote.id, { title: renameValue.trim() });
+      }
+    }
+    setRenamingId(null);
+  };
+
+  const handleCreateNoteFromVoice = (vn: VoiceNote) => {
+    const created = addNote({
+      title: vn.transcript?.substring(0, 40) || 'Voice Note',
+      content: vn.transcript || 'Voice recording',
+      tags: [],
+      categoryId: null,
+      folderId: null,
+      isPinned: false,
+      isFavorite: false,
+      pinLock: null,
+    });
+    updateNote(created.id, { content: (vn.transcript || 'Voice recording') + '\n\n[Audio Recording]' });
+    confetti({ particleCount: 30, colors: ['#10B981'] });
+    onLinkToNote(created.id);
+  };
+
+  const recordingWaveform = isRecording && !isPaused ? waveformLevels : new Array(WAVEFORM_BARS).fill(0.05);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Mic size={20} style={{ color: 'var(--primary)' }} />
-          Voice Notes
-        </h3>
-        <button onClick={onBack} className="md3-btn md3-btn-text">Back</button>
+    <div className="voice-memos-container">
+      {/* Header */}
+      <div className="voice-memos-header">
+        <button onClick={onBack} className="voice-memos-header-btn">
+          <ArrowLeft size={18} />
+        </button>
+        <h2 className="voice-memos-title">Voice Memos</h2>
+        <span className="voice-memos-count">{voiceNotes.length}</span>
       </div>
 
-      <div className="premium-card" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
-        {isRecording ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-            <div className="pulse-recording" style={{ width: '72px', height: '72px', borderRadius: '50%', backgroundColor: 'var(--error)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <Mic size={36} color="#fff" />
-            </div>
-            <div>
-              <span style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-title)' }}>{formatTime(recordingDuration)}</span>
-              <p style={{ fontSize: '12px', color: 'var(--on-surface-variant)', marginTop: '2px' }}>{isPaused ? 'Paused' : 'Recording...'}</p>
-            </div>
-            {transcript && (
-              <div style={{ maxHeight: '80px', overflowY: 'auto', padding: '10px 16px', borderRadius: '12px', background: 'rgba(0,0,0,0.04)', fontSize: '12px', maxWidth: '360px', width: '100%', fontStyle: 'italic' }}>
-                "{transcript}"
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
-              <button onClick={handlePauseRecording} className="md3-btn md3-btn-secondary" style={{ padding: '8px 24px' }}>{isPaused ? 'Resume' : 'Pause'}</button>
-              <button onClick={handleStopRecording} className="md3-btn" style={{ backgroundColor: 'var(--error)', color: '#fff', padding: '8px 24px' }}>
-                <Square size={14} /> Stop
+      {/* Recording Area */}
+      <div className={`voice-recording-area ${isRecording ? 'recording' : ''}`}>
+        {isRecording && <NoiseMeter level={audioLevel} />}
+
+        <div className="voice-mic-section">
+          <div className={`voice-mic-ring ${isRecording ? (isPaused ? 'paused' : 'active') : ''}`}>
+            <AnimatedMic active={isRecording && !isPaused} level={audioLevel} />
+          </div>
+        </div>
+
+        <div className="voice-timer">{formatTime(recordingDuration)}</div>
+
+        {isRecording && (
+          <div className="voice-status-row">
+            <div className={`voice-status-dot ${isPaused ? '' : 'recording'}`} />
+            <span>{isPaused ? 'Paused' : 'Recording'}</span>
+            {!isPaused && <div className="voice-status-waves"><div className="wave-bar" /><div className="wave-bar" /><div className="wave-bar" /></div>}
+          </div>
+        )}
+
+        {/* Waveform */}
+        <WaveformBars levels={recordingWaveform as number[]} active={isRecording && !isPaused} color={isRecording ? '#EF4444' : 'var(--primary)'} />
+
+        {/* Real-time Transcript */}
+        {isRecording && transcript && (
+          <div className="voice-live-transcript">
+            <p>{transcript}</p>
+          </div>
+        )}
+
+        {/* Controls */}
+        <div className="voice-controls">
+          {isRecording ? (
+            <>
+              <button onClick={handlePauseRecording} className="voice-btn voice-btn-secondary" title={isPaused ? 'Resume' : 'Pause'}>
+                {isPaused ? <Play size={20} fill="currentColor" /> : <Pause size={20} />}
               </button>
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-            <button onClick={handleStartRecording} className="pulse-recording" style={{ width: '72px', height: '72px', borderRadius: '50%', backgroundColor: 'var(--primary)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', boxShadow: '0 8px 32px rgba(0,97,164,0.3)' }}>
-              <Mic size={36} color="#fff" />
+              <button onClick={handleStopRecording} className="voice-btn voice-btn-stop" title="Stop">
+                <Square size={18} />
+              </button>
+            </>
+          ) : (
+            <button onClick={handleStartRecording} className="voice-btn voice-btn-record" title="Record">
+              <Mic size={24} />
             </button>
-            <div>
-              <span style={{ fontWeight: 700, fontSize: '15px' }}>Start Recording</span>
-              <p style={{ fontSize: '12px', color: 'var(--on-surface-variant)', marginTop: '2px' }}>Your voice is transcribed in real-time</p>
-            </div>
-          </div>
+          )}
+        </div>
+
+        {!isRecording && (
+          <p className="voice-hint">Tap to record a voice memo</p>
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: '11px', color: 'var(--outline)' }}>Speed:</span>
-        {[0.5, 1.0, 1.5, 2.0].map((speed) => (
-          <button key={speed} onClick={() => handleSpeedChange(speed)}
-            className="md3-chip" style={{ cursor: 'pointer', background: playbackSpeed === speed ? 'var(--primary)' : 'var(--surface-variant)', color: playbackSpeed === speed ? '#fff' : 'var(--on-surface-variant)', fontWeight: 600 }}>
-            {speed}x
-          </button>
-        ))}
-      </div>
+      {/* Recordings List */}
+      <div className="voice-recordings-section">
+        <h3 className="voice-recordings-heading">All Recordings</h3>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h4 style={{ fontSize: '16px' }}>Recordings ({voiceNotes.length})</h4>
         {voiceNotes.length === 0 ? (
-          <div className="md3-card-sm" style={{ textAlign: 'center', padding: '40px 20px', border: '2px dashed var(--outline-variant)' }}>
-            <HelpCircle size={40} style={{ margin: '0 auto 8px', opacity: 0.3 }} />
-            <p style={{ fontSize: '13px', color: 'var(--outline)' }}>No recordings yet</p>
-          </div>
+          <EmptyState
+            illustration={<EmptyVoiceIllustration />}
+            title="No Recordings Yet"
+            message="Your voice is a powerful study tool. Record lectures, ideas, or revision notes on the go."
+            action={{ label: 'Start Recording', onClick: handleStartRecording }}
+            tip="Transcripts are generated automatically — review and link recordings to notes."
+          />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {voiceNotes.map((vn) => {
-              const linkedNote = notes.find(n => n.id === vn.noteId);
+          <div className="voice-recordings-list">
+            {[...voiceNotes].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((vn) => {
+              const isPlaying = playingId === vn.id;
+              const isExpanded = expandedId === vn.id;
+              const isRenaming = renamingId === vn.id;
+
               return (
-                <div key={vn.id} className="md3-card-sm" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <button onClick={() => handlePlayVoice(vn)}
-                        style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-container)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--primary)', cursor: 'pointer', flexShrink: 0 }}>
-                        {playingId === vn.id ? <Square size={14} /> : <Play size={16} style={{ fill: 'var(--primary)' }} />}
-                      </button>
-                      <div>
-                        <span style={{ fontSize: '14px', fontWeight: 600 }}>Voice {formatTime(vn.duration)}</span>
-                        <p style={{ fontSize: '11px', color: 'var(--outline)', marginTop: '1px' }}>
-                          {linkedNote ? linkedNote.title : 'General'}
-                        </p>
+                <div key={vn.id} className={`voice-recording-card ${isPlaying ? 'playing' : ''}`}>
+                  <div className="voice-recording-main" onClick={() => !isRenaming && setExpandedId(isExpanded ? null : vn.id)}>
+                    {/* Play Button */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handlePlayVoice(vn); }}
+                      className="voice-play-btn"
+                    >
+                      {isPlaying ? <Square size={14} /> : <Play size={18} style={{ marginLeft: '2px' }} fill="currentColor" />}
+                    </button>
+
+                    {/* Info */}
+                    <div className="voice-recording-info">
+                      {isRenaming ? (
+                        <div className="voice-rename-row" onClick={e => e.stopPropagation()}>
+                          <input
+                            type="text"
+                            value={renameValue}
+                            onChange={e => setRenameValue(e.target.value)}
+                            autoFocus
+                            className="voice-rename-input"
+                            onKeyDown={e => { if (e.key === 'Enter') handleRename(vn); if (e.key === 'Escape') setRenamingId(null); }}
+                          />
+                          <button onClick={() => handleRename(vn)} className="voice-rename-confirm"><Check size={14} /></button>
+                          <button onClick={() => setRenamingId(null)} className="voice-rename-cancel"><X size={14} /></button>
+                        </div>
+                      ) : (
+                        <div className="voice-recording-title">
+                          {vn.transcript?.substring(0, 40) || `Voice ${formatTime(vn.duration)}`}
+                        </div>
+                      )}
+                      <div className="voice-recording-meta">
+                        <span>{formatTime(vn.duration)}</span>
+                        <span className="voice-meta-dot">·</span>
+                        <span>{new Date(vn.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      {linkedNote && (
-                        <button onClick={() => onLinkToNote(linkedNote.id)} className="md3-btn-ghost" style={{ padding: '6px', color: 'var(--primary)' }}>
-                          <FileText size={16} />
-                        </button>
+
+                    {/* Speed + Actions */}
+                    <div className="voice-recording-actions" onClick={e => e.stopPropagation()}>
+                      {isPlaying && (
+                        <div className="voice-speed-row">
+                          {[0.5, 1, 1.5, 2].map(s => (
+                            <button
+                              key={s}
+                              onClick={() => handleSpeedChange(s)}
+                              className={`voice-speed-chip ${playbackSpeed === s ? 'active' : ''}`}
+                            >
+                              {s}x
+                            </button>
+                          ))}
+                        </div>
                       )}
-                      <button onClick={() => deleteVoiceNote(vn.id)} className="md3-btn-ghost" style={{ padding: '6px', color: 'var(--error)' }}>
-                        <Trash2 size={16} />
+                      <button onClick={() => { setRenamingId(vn.id); setRenameValue(vn.transcript?.substring(0, 40) || `Voice ${formatTime(vn.duration)}`); }} className="voice-action-btn" title="Rename">
+                        <Edit3 size={14} />
+                      </button>
+                      <button onClick={() => { handleCreateNoteFromVoice(vn); }} className="voice-action-btn" title="Create Note">
+                        <FileText size={14} />
+                      </button>
+                      <button onClick={() => deleteVoiceNote(vn.id)} className="voice-action-btn voice-action-delete" title="Delete">
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </div>
-                  {vn.transcript && (
-                    <div style={{ padding: '8px 12px', background: 'var(--surface-variant)', borderRadius: '8px', fontSize: '11px', color: 'var(--on-surface-variant)', borderLeft: '3px solid var(--primary)', fontStyle: 'italic' }}>
-                      "{vn.transcript}"
+
+                  {/* Playback Waveform / Progress */}
+                  {isPlaying && (
+                    <div className="voice-playback-bar" onClick={(e) => handleSeek(vn, e)}>
+                      <div className="voice-playback-track">
+                        <div className="voice-playback-fill" style={{ width: `${vn.duration > 0 ? (playbackProgress / vn.duration) * 100 : 0}%` }} />
+                      </div>
+                      <div className="voice-playback-time">
+                        <span>{formatTime(playbackProgress)}</span>
+                        <span>{formatTime(vn.duration)}</span>
+                      </div>
                     </div>
+                  )}
+
+                  {/* Expanded: Transcript + Waveform preview */}
+                  {isExpanded && !isPlaying && (
+                    <div className="voice-expanded-section">
+                      <div className="voice-expanded-waveform">
+                        {Array.from({ length: 60 }).map((_, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              height: `${10 + Math.sin(i * 1.5) * 15 + Math.cos(i * 0.7) * 10 + 10}%`,
+                              width: '3px',
+                              borderRadius: '2px',
+                              background: 'var(--outline-variant)',
+                              opacity: 0.4,
+                            }}
+                          />
+                        ))}
+                      </div>
+                      {vn.transcript && (
+                        <div className="voice-transcript-panel">
+                          <div className="voice-transcript-header">
+                            <Volume2 size={13} />
+                            <span>Transcript</span>
+                          </div>
+                          <p className="voice-transcript-text">{vn.transcript}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {isExpanded && (
+                    <button className="voice-expand-toggle" onClick={() => setExpandedId(null)}>
+                      <ChevronUp size={16} />
+                    </button>
                   )}
                 </div>
               );
@@ -243,7 +533,6 @@ export default function VoiceNotes({ onBack, onLinkToNote }: VoiceNotesProps) {
           </div>
         )}
       </div>
-
     </div>
   );
 }

@@ -5,12 +5,13 @@ import { useStore } from '@/lib/store/useStore';
 import HomeScreen from '@/components/HomeScreen';
 import NoteEditor from '@/components/NoteEditor';
 import VoiceNotes from '@/components/VoiceNotes';
-import AiHelper from '@/components/AiHelper';
+import AiTutor from '@/components/AiTutor';
 import RevisionCalendar from '@/components/RevisionCalendar';
 import ProfileView from '@/components/ProfileView';
+import GamificationHub from '@/components/GamificationHub';
 import { 
   Home, FileText, Mic, Calendar, Sparkles, User, Sun, Moon, 
-  LogIn, Wifi, WifiOff, ChevronRight
+  LogIn, Wifi, WifiOff, ChevronRight, Trophy
 } from 'lucide-react';
 import { SignInButton, UserButton, useAuth, useUser } from '@clerk/nextjs';
 
@@ -52,6 +53,7 @@ export default function Page() {
     { id: 'voice', label: 'Voice Notes', icon: Mic },
     { id: 'calendar', label: 'Revision', icon: Calendar },
     { id: 'ai', label: 'AI Assistant', icon: Sparkles },
+    { id: 'gamification', label: 'Achievements', icon: Trophy },
     { id: 'profile', label: 'Profile', icon: User },
   ];
 
@@ -179,7 +181,8 @@ export default function Page() {
               />
             )}
             {activeTab === 'calendar' && <RevisionCalendar />}
-            {activeTab === 'ai' && <AiHelper />}
+            {activeTab === 'ai' && <AiTutor />}
+            {activeTab === 'gamification' && <GamificationHub />}
             {activeTab === 'profile' && <ProfileView />}
           </div>
         </main>

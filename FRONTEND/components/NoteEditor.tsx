@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useStore, Note, Category, Folder } from '@/lib/store/useStore';
-import { 
-  ArrowLeft, Save, Pin, Star, Lock, Unlock, Download, Upload,
-  Volume2, VolumeX, Mic, MicOff, Tag, FolderOpen, Calendar, RefreshCw
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useStore } from '@/lib/store/useStore';
+import {
+  ArrowLeft, Pin, Star, Lock, Unlock, Download, Upload,
+  Volume2, VolumeX, Mic, MicOff, Tag, FolderOpen, RefreshCw,
+  Bold, Italic, Underline, Strikethrough, Heading1, Heading2, Heading3,
+  List, ListOrdered, Quote, Code, Table2, Image, Sigma,
+  Undo2, Redo2, Sparkles, Send, X
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import confetti from 'canvas-confetti';
@@ -16,35 +19,50 @@ interface NoteEditorProps {
 
 interface SpeechRecognitionEvent {
   resultIndex: number;
-  results: {
-    [key: number]: {
-      [key: number]: {
-        transcript: string;
-      };
-    };
-  };
+  results: { [key: number]: { [key: number]: { transcript: string } } };
 }
-
-interface SpeechRecognitionErrorEvent {
-  error: string;
-}
-
+interface SpeechRecognitionErrorEvent { error: string; }
 interface SpeechRecognition {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  onstart: () => void;
-  onresult: (event: SpeechRecognitionEvent) => void;
-  onerror: (event: SpeechRecognitionErrorEvent) => void;
-  onend: () => void;
-  start: () => void;
-  stop: () => void;
+  continuous: boolean; interimResults: boolean; lang: string;
+  onstart: () => void; onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void; onend: () => void;
+  start: () => void; stop: () => void;
+}
+
+const TABLE_SIZES = [3, 4, 5, 6, 7, 8];
+
+function generateTableHtml(rows: number, cols: number): string {
+  let html = '<div class="editor-table-wrapper"><table class="editor-table"><thead><tr>';
+  for (let c = 0; c < cols; c++) html += '<th></th>';
+  html += '</tr></thead><tbody>';
+  for (let r = 0; r < rows; r++) {
+    html += '<tr>';
+    for (let c = 0; c < cols; c++) html += '<td></td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function insertAtCursor(html: string) {
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0) {
+    const range = sel.getRangeAt(0);
+    const fragment = range.createContextualFragment(html);
+    range.deleteContents();
+    range.insertNode(fragment);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
+
+function execFormat(command: string, value?: string) {
+  document.execCommand(command, false, value);
 }
 
 export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
-  const { 
-    notes, categories, folders, addNote, updateNote, deleteNote 
-  } = useStore();
+  const { notes, categories, folders, addNote, updateNote, deleteNote } = useStore();
 
   const isNew = !noteId;
   const activeNote = notes.find(n => n.id === noteId);
@@ -70,6 +88,19 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [showTablePicker, setShowTablePicker] = useState(false);
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(3);
+  const [showAiAssistant, setShowAiAssistant] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [showCodeLang, setShowCodeLang] = useState(false);
+
   useEffect(() => {
     if (activeNote) {
       setTitle(activeNote.title);
@@ -91,6 +122,8 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
       setPinLock(null);
     }
     setSaveStatus('saved');
+    setHistory([]);
+    setHistoryIndex(-1);
   }, [noteId, activeNote]);
 
   useEffect(() => {
@@ -112,12 +145,14 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
         rec.onresult = (event: SpeechRecognitionEvent) => {
           let finalTranscript = '';
           for (let i = event.resultIndex; i < (event.results as any).length; ++i) {
-            if (event.results[i][0].transcript) {
-              finalTranscript += event.results[i][0].transcript;
-            }
+            if (event.results[i][0].transcript) finalTranscript += event.results[i][0].transcript;
           }
           if (finalTranscript) {
-            setContent(prev => prev + ' ' + finalTranscript);
+            if (editorRef.current) {
+              editorRef.current.focus();
+              insertAtCursor(finalTranscript + ' ');
+            }
+            setContent(prev => prev + finalTranscript + ' ');
             setSaveStatus('unsaved');
           }
         };
@@ -152,6 +187,164 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
     }, 1500);
     return () => clearTimeout(timer);
   }, [title, content, tags, categoryId, folderId, isPinned, isFavorite, pinLock]);
+
+  const pushHistory = useCallback((html: string) => {
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(html);
+      if (newHistory.length > 50) newHistory.shift();
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  }, [historyIndex]);
+
+  const handleEditorInput = () => {
+    if (editorRef.current) {
+      const html = editorRef.current.innerHTML;
+      setContent(html);
+      setSaveStatus('unsaved');
+      pushHistory(html);
+    }
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      const html = history[newIndex];
+      if (editorRef.current) {
+        editorRef.current.innerHTML = html;
+        setContent(html);
+      }
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      const html = history[newIndex];
+      if (editorRef.current) {
+        editorRef.current.innerHTML = html;
+        setContent(html);
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      e.preventDefault();
+      if (e.shiftKey) handleRedo();
+      else handleUndo();
+      return;
+    }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      execFormat('insertHTML', '    ');
+    }
+    if (e.key === 'Enter') {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const node = sel.getRangeAt(0).startContainer;
+        if (node.parentElement?.closest('li')) return;
+        if (node.parentElement?.closest('pre')) return;
+        const parentBlock = node.parentElement?.closest('p,h1,h2,h3,h4,blockquote') as HTMLElement;
+        if (parentBlock) {
+          const text = parentBlock.textContent || '';
+          if (text === '') {
+            e.preventDefault();
+            execFormat('formatBlock', '<p>');
+            return;
+          }
+        }
+      }
+    }
+    if (e.key === ' ') {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const node = sel.getRangeAt(0).startContainer;
+        const text = node.textContent || '';
+        const beforeCaret = text.substring(0, sel.getRangeAt(0).startOffset);
+        if (beforeCaret.trim() === '#') {
+          e.preventDefault();
+          execFormat('formatBlock', '<h1>');
+          if (editorRef.current) {
+            const textNode = editorRef.current.querySelector('h1');
+            if (textNode) textNode.textContent = '';
+          }
+        } else if (beforeCaret.trim() === '##') {
+          e.preventDefault();
+          execFormat('formatBlock', '<h2>');
+          if (editorRef.current) {
+            const textNode = editorRef.current.querySelector('h2');
+            if (textNode) textNode.textContent = '';
+          }
+        } else if (beforeCaret.trim() === '###') {
+          e.preventDefault();
+          execFormat('formatBlock', '<h3>');
+          if (editorRef.current) {
+            const textNode = editorRef.current.querySelector('h3');
+            if (textNode) textNode.textContent = '';
+          }
+        } else if (beforeCaret.trim() === '>') {
+          e.preventDefault();
+          execFormat('formatBlock', '<blockquote>');
+          if (editorRef.current) {
+            const blockq = editorRef.current.querySelector('blockquote');
+            if (blockq) blockq.textContent = '';
+          }
+        } else if (beforeCaret.trim() === '- ' || beforeCaret.trim() === '* ') {
+          e.preventDefault();
+          execFormat('insertUnorderedList');
+          if (editorRef.current) {
+            const li = editorRef.current.querySelector('li:last-child');
+            if (li) li.textContent = '';
+          }
+        } else if (beforeCaret.trim() === '1. ') {
+          e.preventDefault();
+          execFormat('insertOrderedList');
+          if (editorRef.current) {
+            const li = editorRef.current.querySelector('li:last-child');
+            if (li) li.textContent = '';
+          }
+        } else if (beforeCaret.endsWith('```')) {
+          e.preventDefault();
+          insertCodeBlock('javascript');
+        }
+      }
+    }
+  };
+
+  const insertCodeBlock = (lang: string) => {
+    const html = `<div class="editor-code-block"><div class="editor-code-header"><span>${lang}</span><button class="editor-code-copy" onclick="(function(btn){var code=btn.parentElement.nextElementSibling.textContent;navigator.clipboard.writeText(code);btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy'},2000);})(this)">Copy</button></div><pre><code class="language-${lang}"> </code></pre></div>`;
+    insertAtCursor(html);
+    if (editorRef.current) handleEditorInput();
+  };
+
+  const insertTable = () => {
+    const html = generateTableHtml(tableRows, tableCols);
+    insertAtCursor(html);
+    setShowTablePicker(false);
+    if (editorRef.current) handleEditorInput();
+  };
+
+  const insertImage = () => {
+    const url = prompt('Paste image URL:');
+    if (url) {
+      const html = `<figure class="editor-image-block"><img src="${url}" alt="Image" loading="lazy" /><figcaption>Image</figcaption></figure>`;
+      insertAtCursor(html);
+      if (editorRef.current) handleEditorInput();
+    }
+  };
+
+  const insertMath = () => {
+    const expr = prompt('Enter math expression (e.g., E = mc²):');
+    if (expr) {
+      const html = `<span class="editor-math-inline" contenteditable="false">📐 ${expr}</span>`;
+      insertAtCursor(html + ' ');
+      if (editorRef.current) handleEditorInput();
+    }
+  };
 
   const handleListenNote = () => {
     if (!synthRef.current) return;
@@ -243,120 +436,266 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
       const text = event.target?.result as string;
       const fileTitle = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
       setTitle(fileTitle);
-      setContent(text);
+      const escaped = text.replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/`(.+?)`/g, '<code>$1</code>');
+      setContent(`<p>${escaped}</p>`);
       setSaveStatus('unsaved');
       confetti({ particleCount: 50, colors: ['#0061A4'] });
     };
     reader.readAsText(file);
   };
 
+  const handleAiAssist = async () => {
+    if (!aiPrompt.trim() || isAiLoading) return;
+    setIsAiLoading(true);
+    setAiResponse('');
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: aiPrompt }] }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        const text = data.message?.content || '';
+        setAiResponse(text);
+      } else {
+        setAiResponse('AI response failed. Try again.');
+      }
+    } catch {
+      setAiResponse('AI response failed. Try again.');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const insertAiResponse = () => {
+    if (aiResponse) {
+      const html = aiResponse.replace(/\n/g, '<br>');
+      insertAtCursor(`<p>${html}</p>`);
+      if (editorRef.current) handleEditorInput();
+      setShowAiAssistant(false);
+      setAiPrompt('');
+      setAiResponse('');
+    }
+  };
+
+  const toolbarItems = [
+    { icon: Undo2, action: handleUndo, label: 'Undo' },
+    { icon: Redo2, action: handleRedo, label: 'Redo' },
+    { type: 'divider' as const },
+    { icon: Bold, action: () => execFormat('bold'), label: 'Bold', shortcut: '**' },
+    { icon: Italic, action: () => execFormat('italic'), label: 'Italic', shortcut: '*' },
+    { icon: Underline, action: () => execFormat('underline'), label: 'Underline' },
+    { icon: Strikethrough, action: () => execFormat('strikeThrough'), label: 'Strikethrough' },
+    { type: 'divider' as const },
+    { icon: Heading1, action: () => execFormat('formatBlock', '<h1>'), label: 'Heading 1' },
+    { icon: Heading2, action: () => execFormat('formatBlock', '<h2>'), label: 'Heading 2' },
+    { icon: Heading3, action: () => execFormat('formatBlock', '<h3>'), label: 'Heading 3' },
+    { type: 'divider' as const },
+    { icon: List, action: () => execFormat('insertUnorderedList'), label: 'Bullet List' },
+    { icon: ListOrdered, action: () => execFormat('insertOrderedList'), label: 'Numbered List' },
+    { icon: Quote, action: () => execFormat('formatBlock', '<blockquote>'), label: 'Quote' },
+    { icon: Code, action: () => insertCodeBlock('javascript'), label: 'Code Block' },
+    { type: 'divider' as const },
+    { icon: Sigma, action: insertMath, label: 'Math' },
+    { icon: Table2, action: () => setShowTablePicker(!showTablePicker), label: 'Table' },
+    { icon: Image, action: insertImage, label: 'Image' },
+  ];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minHeight: '100%' }}>
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <button onClick={onBack} className="md3-btn md3-btn-text" style={{ padding: '8px 12px' }}>
-          <ArrowLeft size={18} /> Back
-        </button>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span style={{ 
-            fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px',
-            color: saveStatus === 'saved' ? '#10B981' : saveStatus === 'saving' ? 'var(--primary)' : 'var(--outline)'
-          }}>
-            <RefreshCw size={12} className={saveStatus === 'saving' ? 'pulse-recording' : ''} />
-            {saveStatus === 'saved' ? 'Saved' : saveStatus === 'saving' ? 'Saving...' : 'Unsaved'}
-          </span>
-          <button onClick={() => setIsPinned(!isPinned)} className="md3-btn-ghost" style={{ borderRadius: '50%', padding: '8px', color: isPinned ? 'var(--primary)' : 'var(--outline)' }}>
-            <Pin size={18} style={{ fill: isPinned ? 'var(--primary)' : 'transparent' }} />
-          </button>
-          <button onClick={() => setIsFavorite(!isFavorite)} className="md3-btn-ghost" style={{ borderRadius: '50%', padding: '8px', color: isFavorite ? '#F59E0B' : 'var(--outline)' }}>
-            <Star size={18} style={{ fill: isFavorite ? '#F59E0B' : 'transparent' }} />
-          </button>
-          <button onClick={handleLockToggle} className="md3-btn-ghost" style={{ borderRadius: '50%', padding: '8px', color: pinLock ? 'var(--error)' : 'var(--outline)' }}>
-            {pinLock ? <Lock size={18} /> : <Unlock size={18} />}
-          </button>
+    <div className="editor-container">
+      {/* ─── Toolbar ─── */}
+      <div className="editor-toolbar-wrapper">
+        <div className="editor-toolbar">
+          <div className="editor-toolbar-left">
+            <button onClick={onBack} className="editor-toolbar-back">
+              <ArrowLeft size={16} />
+            </button>
+            <span className="editor-toolbar-divider" />
+            {toolbarItems.map((item, i) => {
+              if ('type' in item && item.type === 'divider') {
+                return <span key={i} className="editor-toolbar-divider" />;
+              }
+              if ('icon' in item) {
+                const Icon = item.icon!;
+                return (
+                  <button key={i} onClick={item.action} className="editor-toolbar-btn" title={item.label}>
+                    <Icon size={15} />
+                  </button>
+                );
+              }
+              return null;
+            })}
+          </div>
+          <div className="editor-toolbar-right">
+            <span className="editor-save-status" style={{ color: saveStatus === 'saved' ? '#10B981' : saveStatus === 'saving' ? 'var(--primary)' : 'var(--outline)' }}>
+              <RefreshCw size={11} className={saveStatus === 'saving' ? 'pulse-recording' : ''} />
+              {saveStatus === 'saved' ? 'Saved' : saveStatus === 'saving' ? 'Saving...' : 'Unsaved'}
+            </span>
+            <button onClick={() => setIsPinned(!isPinned)} className="editor-toolbar-btn" style={{ color: isPinned ? 'var(--primary)' : 'var(--outline)' }}>
+              <Pin size={15} style={{ fill: isPinned ? 'var(--primary)' : 'transparent' }} />
+            </button>
+            <button onClick={() => setIsFavorite(!isFavorite)} className="editor-toolbar-btn" style={{ color: isFavorite ? '#F59E0B' : 'var(--outline)' }}>
+              <Star size={15} style={{ fill: isFavorite ? '#F59E0B' : 'transparent' }} />
+            </button>
+            <button onClick={handleLockToggle} className="editor-toolbar-btn" style={{ color: pinLock ? 'var(--error)' : 'var(--outline)' }}>
+              {pinLock ? <Lock size={15} /> : <Unlock size={15} />}
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="md3-card-sm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', padding: '16px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--on-surface-variant)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Tag size={12} /> Subject
-          </label>
-          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="md3-input" style={{ padding: '10px 14px' }}>
+      {/* ─── Meta Bar ─── */}
+      <div className="editor-meta-bar">
+        <div className="editor-meta-field">
+          <Tag size={12} />
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
             <option value="">General</option>
             {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
           </select>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--on-surface-variant)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <FolderOpen size={12} /> Folder
-          </label>
-          <select value={folderId} onChange={(e) => setFolderId(e.target.value)} className="md3-input" style={{ padding: '10px 14px' }}>
+        <div className="editor-meta-field">
+          <FolderOpen size={12} />
+          <select value={folderId} onChange={(e) => setFolderId(e.target.value)}>
             <option value="">Root</option>
             {folders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
           </select>
         </div>
       </div>
 
-      <div className="md3-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexGrow: 1, padding: '20px' }}>
-        <input 
-          type="text" placeholder="Note Title" value={title}
+      {/* ─── Editor ─── */}
+      <div className="editor-paper">
+        <input
+          type="text" placeholder="Untitled" value={title}
           onChange={(e) => { setTitle(e.target.value); setSaveStatus('unsaved'); }}
-          style={{ width: '100%', border: 'none', borderBottom: '2px solid var(--outline-variant)', outline: 'none', padding: '8px 0', fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-title)', backgroundColor: 'transparent', color: 'var(--on-background)' }}
+          className="editor-title-input"
         />
 
         {isSpeaking && (
-          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', padding: '8px 14px', backgroundColor: 'var(--primary-container)', borderRadius: '100px', width: 'fit-content' }}>
+          <div className="editor-speaking-indicator">
             <div className="wave-bar" /><div className="wave-bar" /><div className="wave-bar" /><div className="wave-bar" />
-            <span style={{ fontSize: '12px', color: 'var(--on-primary-container)', marginLeft: '6px' }}>Reading aloud...</span>
-            <button onClick={handleStopListeningVoice} className="md3-btn-ghost" style={{ color: 'var(--error)', padding: '2px', marginLeft: '8px' }}>
+            <span>Reading aloud...</span>
+            <button onClick={handleStopListeningVoice} className="editor-speaking-stop">
               <VolumeX size={14} /> Stop
             </button>
           </div>
         )}
 
-        <textarea 
-          placeholder="Start typing your study notes..." value={content}
-          onChange={(e) => { setContent(e.target.value); setSaveStatus('unsaved'); }}
-          style={{ width: '100%', flexGrow: 1, border: 'none', outline: 'none', resize: 'none', fontSize: '15px', lineHeight: 1.7, padding: '10px 0', minHeight: '300px', backgroundColor: 'transparent', color: 'var(--on-background)', fontFamily: 'var(--font-body)' }}
+        <div
+          ref={editorRef}
+          className="editor-content"
+          contentEditable
+          suppressContentEditableWarning
+          onInput={handleEditorInput}
+          onKeyDown={handleKeyDown}
+          dangerouslySetInnerHTML={{ __html: content || '<p><br></p>' }}
         />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+      {/* ─── Tags ─── */}
+      <div className="editor-tags-section">
+        <div className="editor-tags-list">
           {tags.map((tag) => (
-            <span key={tag} className="md3-chip" style={{ background: 'var(--primary-container)', color: 'var(--on-primary-container)' }}>
+            <span key={tag} className="editor-tag">
               #{tag}
-              <button type="button" onClick={() => handleRemoveTag(tag)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--error)', padding: 0, fontSize: '14px' }}>×</button>
+              <button onClick={() => handleRemoveTag(tag)}>×</button>
             </span>
           ))}
         </div>
         <input type="text" placeholder="Add tags... (Press Enter)" value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)} onKeyDown={handleAddTag} className="md3-input" style={{ padding: '10px 14px' }} />
+          onChange={(e) => setTagInput(e.target.value)} onKeyDown={handleAddTag} className="editor-tags-input" />
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', paddingTop: '12px', borderTop: '1px solid var(--outline-variant)', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button type="button" onClick={handleListenNote} className={`md3-btn ${isSpeaking && !isPaused ? 'md3-btn-primary' : 'md3-btn-secondary'}`}>
-            <Volume2 size={16} /> {isSpeaking ? (isPaused ? 'Resume' : 'Pause') : 'Listen'}
+      {/* ─── Footer ─── */}
+      <div className="editor-footer">
+        <div className="editor-footer-left">
+          <button onClick={handleListenNote} className={`editor-footer-btn ${isSpeaking && !isPaused ? 'active' : ''}`}>
+            <Volume2 size={15} /> {isSpeaking ? (isPaused ? 'Resume' : 'Pause') : 'Listen'}
           </button>
-          <button type="button" onClick={handleDictateSpeech}
-            className={`md3-btn ${isListening ? 'md3-btn-primary pulse-recording' : 'md3-btn-secondary'}`}
-            style={{ backgroundColor: isListening ? 'var(--error)' : undefined, color: isListening ? '#fff' : undefined }}>
-            {isListening ? <MicOff size={16} /> : <Mic size={16} />} {isListening ? 'Stop' : 'Dictate'}
+          <button onClick={handleDictateSpeech} className={`editor-footer-btn ${isListening ? 'recording' : ''}`}>
+            {isListening ? <MicOff size={15} /> : <Mic size={15} />} {isListening ? 'Stop' : 'Dictate'}
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button type="button" onClick={handleExportPDF} className="md3-btn md3-btn-secondary">
-            <Download size={16} /> PDF
+        <div className="editor-footer-right">
+          <button onClick={handleExportPDF} className="editor-footer-btn">
+            <Download size={15} /> PDF
           </button>
-          <label className="md3-btn md3-btn-secondary" style={{ cursor: 'pointer' }}>
-            <Upload size={16} /> Import
+          <label className="editor-footer-btn">
+            <Upload size={15} /> Import
             <input type="file" accept=".txt,.md" onChange={handleImportFile} style={{ display: 'none' }} />
           </label>
         </div>
       </div>
 
+      {/* ─── Table Picker ─── */}
+      {showTablePicker && (
+        <div className="editor-table-picker-overlay" onClick={() => setShowTablePicker(false)}>
+          <div className="editor-table-picker" onClick={e => e.stopPropagation()}>
+            <div className="editor-table-picker-header">
+              <Table2 size={14} /> Insert Table
+            </div>
+            <div className="editor-table-picker-grid">
+              <div className="editor-table-picker-sizes">
+                <label>Rows</label>
+                <select value={tableRows} onChange={e => setTableRows(Number(e.target.value))}>
+                  {TABLE_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              <div className="editor-table-picker-sizes">
+                <label>Columns</label>
+                <select value={tableCols} onChange={e => setTableCols(Number(e.target.value))}>
+                  {TABLE_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+            <button onClick={insertTable} className="editor-table-picker-insert">
+              Insert Table
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Floating AI Assistant ─── */}
+      {showAiAssistant && (
+        <div className="editor-ai-overlay" onClick={() => setShowAiAssistant(false)}>
+          <div className="editor-ai-panel" onClick={e => e.stopPropagation()}>
+            <div className="editor-ai-header">
+              <Sparkles size={16} /> SnapAI Assistant
+              <button onClick={() => setShowAiAssistant(false)} className="editor-ai-close">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="editor-ai-body">
+              <textarea
+                placeholder="Ask AI to write, rewrite, or improve content..."
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                className="editor-ai-input"
+                rows={3}
+              />
+              <button onClick={handleAiAssist} className="editor-ai-send" disabled={isAiLoading || !aiPrompt.trim()}>
+                {isAiLoading ? 'Thinking...' : 'Generate'}
+                <Send size={14} />
+              </button>
+              {aiResponse && (
+                <div className="editor-ai-response">
+                  <p>{aiResponse}</p>
+                  <button onClick={insertAiResponse} className="editor-ai-insert-btn">
+                    Insert into Note
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── AI FAB ─── */}
+      <button onClick={() => setShowAiAssistant(true)} className="editor-ai-fab">
+        <Sparkles size={20} />
+      </button>
+
+      {/* ─── Pin Modal ─── */}
       {showPinModal && (
         <div className="modal-backdrop" onClick={() => setShowPinModal(false)}>
           <form className="modal-content" onClick={e => e.stopPropagation()} onSubmit={handleSavePin} style={{ textAlign: 'center', maxWidth: '360px' }}>
@@ -373,7 +712,6 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
           </form>
         </div>
       )}
-
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   Send, Sparkles, AlertCircle, HelpCircle, Languages, LayoutGrid, FileText
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import EmptyState, { EmptyAiIllustration, EmptyMcqIllustration, EmptyFlashcardIllustration } from './EmptyState';
 
 export default function AiHelper() {
   const { getToken } = useAuth();
@@ -50,7 +51,7 @@ export default function AiHelper() {
     setChatInput('');
     setIsChatLoading(true);
     try {
-      const data = await apiFetch(API.ai.chat, { method: 'POST', body: JSON.stringify({ messages: updatedMessages }), token: await getToken() });
+      const data = await apiFetch(API.ai.chat, { method: 'POST', body: JSON.stringify({ messages: updatedMessages }), token: (await getToken()) ?? undefined });
       if (data.success) setChatMessages([...updatedMessages, data.message]);
       else throw new Error(data.error);
     } catch (err: any) {
@@ -63,7 +64,7 @@ export default function AiHelper() {
     setIsSummarizing(true);
     setSummary('');
     try {
-      const data = await apiFetch(API.ai.summarize, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content }), token: await getToken() });
+      const data = await apiFetch(API.ai.summarize, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content }), token: (await getToken()) ?? undefined });
       if (data.success) { setSummary(data.summary); confetti({ particleCount: 30, colors: ['#0061A4'] }); }
       else throw new Error(data.error);
     } catch (err: any) { setSummary(`Error: ${err.message}`); }
@@ -77,7 +78,7 @@ export default function AiHelper() {
     setSelectedAnswers({});
     setShowExplanation({});
     try {
-      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'mcq' }), token: await getToken() });
+      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'mcq' }), token: (await getToken()) ?? undefined });
       if (data.success) { setMcqs(data.mcqs); confetti({ particleCount: 40, colors: ['#10B981', '#3B82F6'] }); }
       else throw new Error(data.error);
     } catch (err: any) { alert(`Failed: ${err.message}`); }
@@ -90,7 +91,7 @@ export default function AiHelper() {
     setFlashcards([]);
     setFlippedCards({});
     try {
-      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'flashcard' }), token: await getToken() });
+      const data = await apiFetch(API.ai.mcqs, { method: 'POST', body: JSON.stringify({ title: activeNote.title, content: activeNote.content, type: 'flashcard' }), token: (await getToken()) ?? undefined });
       if (data.success) { setFlashcards(data.flashcards); confetti({ particleCount: 40, colors: ['#EC4899'] }); }
       else throw new Error(data.error);
     } catch (err: any) { alert(`Failed: ${err.message}`); }
@@ -102,7 +103,7 @@ export default function AiHelper() {
     setIsTranslating(true);
     setTranslatedText('');
     try {
-      const data = await apiFetch(API.ai.translate, { method: 'POST', body: JSON.stringify({ content: activeNote.content, targetLanguage: lang }), token: await getToken() });
+      const data = await apiFetch(API.ai.translate, { method: 'POST', body: JSON.stringify({ content: activeNote.content, targetLanguage: lang }), token: (await getToken()) ?? undefined });
       if (data.success) { setTranslatedText(data.translatedText); confetti({ particleCount: 30, colors: ['#8B5CF6'] }); }
       else throw new Error(data.error);
     } catch (err: any) { setTranslatedText(`Translation failed: ${err.message}`); }
@@ -133,10 +134,12 @@ export default function AiHelper() {
       </div>
 
       {activeSubTab !== 'chat' && !activeNote && (
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', padding: '14px 18px', borderRadius: '12px', background: 'var(--error-container)', color: 'var(--error)', fontSize: '12px' }}>
-          <AlertCircle size={18} />
-          Open a note first to use this tool
-        </div>
+        <EmptyState
+          illustration={<EmptyAiIllustration />}
+          title="No Note Selected"
+          message="Open a study note to unlock AI tools — summarize, quiz, and translate your content."
+          tip="You can also chat with SnapAI freely without selecting a note."
+        />
       )}
 
       <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -172,7 +175,7 @@ export default function AiHelper() {
             <button onClick={handleSummarizeNote} className="md3-btn md3-btn-primary" disabled={isSummarizing} style={{ width: 'fit-content' }}>
               {isSummarizing ? 'Summarizing...' : 'Summarize Note'}
             </button>
-            {summary && (
+            {summary ? (
               <div className="md3-card" style={{ fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                   <FileText size={16} style={{ color: 'var(--primary)' }} />
@@ -180,6 +183,14 @@ export default function AiHelper() {
                 </div>
                 {summary}
               </div>
+            ) : (
+              <EmptyState
+                illustration={<EmptyAiIllustration />}
+                title="Waiting to Summarize"
+                message="SnapAI will condense your note into clear, bite-sized key points."
+                action={!isSummarizing ? { label: 'Summarize Now', onClick: handleSummarizeNote } : undefined}
+                tip="Summaries help with last-minute revision before exams."
+              />
             )}
           </div>
         )}
@@ -189,7 +200,15 @@ export default function AiHelper() {
             <button onClick={handleGenerateMcqs} className="md3-btn md3-btn-primary" disabled={isMcqLoading} style={{ width: 'fit-content' }}>
               {isMcqLoading ? 'Generating...' : 'Generate 3 MCQs'}
             </button>
-            {mcqs.map((mcq, idx) => {
+            {mcqs.length === 0 ? (
+              <EmptyState
+                illustration={<EmptyMcqIllustration />}
+                title="No Quiz Generated"
+                message="Test your understanding — SnapAI creates MCQs from your note content."
+                action={!isMcqLoading ? { label: 'Generate Quiz', onClick: handleGenerateMcqs } : undefined}
+                tip="MCQs improve retention and highlight areas you need to revise more."
+              />
+            ) : mcqs.map((mcq, idx) => {
               const answered = selectedAnswers[idx] !== undefined;
               return (
                 <div key={idx} className="md3-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
@@ -229,6 +248,15 @@ export default function AiHelper() {
             <button onClick={handleGenerateFlashcards} className="md3-btn md3-btn-primary" disabled={isFlashcardLoading} style={{ width: 'fit-content' }}>
               {isFlashcardLoading ? 'Creating...' : 'Create Flashcards'}
             </button>
+            {flashcards.length === 0 ? (
+              <EmptyState
+                illustration={<EmptyFlashcardIllustration />}
+                title="No Flashcards Yet"
+                message="Turn your notes into interactive flashcards for quick, spaced revision."
+                action={!isFlashcardLoading ? { label: 'Create Flashcards', onClick: handleGenerateFlashcards } : undefined}
+                tip="Flashcards are proven to boost memory retention through active recall."
+              />
+            ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
               {flashcards.map((fc, idx) => {
                 const isFlipped = flippedCards[idx] || false;
@@ -250,6 +278,7 @@ export default function AiHelper() {
                 );
               })}
             </div>
+            )}
           </div>
         )}
 
@@ -263,7 +292,7 @@ export default function AiHelper() {
                 Translate to English
               </button>
             </div>
-            {translatedText && (
+            {translatedText ? (
               <div className="md3-card" style={{ fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                   <Languages size={16} style={{ color: 'var(--primary)' }} />
@@ -271,6 +300,14 @@ export default function AiHelper() {
                 </div>
                 {translatedText}
               </div>
+            ) : (
+              <EmptyState
+                illustration={<EmptyAiIllustration />}
+                title="Ready to Translate"
+                message="Break language barriers — translate your notes between Hindi and English instantly."
+                action={{ label: 'Translate to Hindi', onClick: () => handleTranslateNote('hindi') }}
+                tip="Bilingual notes help with better understanding and revision in your preferred language."
+              />
             )}
           </div>
         )}

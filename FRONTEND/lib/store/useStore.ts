@@ -56,6 +56,27 @@ export interface RevisionLog {
   nextScheduledAt: string;
 }
 
+export interface Achievement {
+  id: string;
+  label: string;
+  emoji: string;
+  description: string;
+  condition: (state: AppState) => boolean;
+  xpReward: number;
+  coinReward: number;
+}
+
+export interface WeeklyChallenge {
+  id: string;
+  label: string;
+  description: string;
+  target: number;
+  progress: number;
+  xpReward: number;
+  coinReward: number;
+  weekStart: string;
+}
+
 interface AppState {
   theme: 'light' | 'dark';
   user: UserProfile;
@@ -69,6 +90,15 @@ interface AppState {
   activeFolderId: string | null;
   activeCategoryId: string | null;
   searchQuery: string;
+  activeAiTool: string | null;
+
+  // Gamification
+  coins: number;
+  earnedAchievements: string[];
+  weeklyChallenge: WeeklyChallenge | null;
+  dailyGoal: number;
+  dailyProgress: number;
+  lastDailyReset: string;
 
   // Theme Actions
   toggleTheme: () => void;
@@ -112,12 +142,23 @@ interface AppState {
   markAsRevised: (noteId: string, rating: 'easy' | 'medium' | 'hard') => void;
   setRevisionLogs: (logs: RevisionLog[]) => void;
 
+  // Gamification Actions
+  addCoins: (amount: number) => void;
+  spendCoins: (amount: number) => boolean;
+  earnAchievement: (id: string) => void;
+  setWeeklyChallenge: (challenge: WeeklyChallenge | null) => void;
+  updateWeeklyProgress: (amount: number) => void;
+  incrementDailyProgress: (amount: number) => void;
+  resetDailyProgress: () => void;
+  checkAndResetDaily: () => void;
+
   // Sync / App UI State Actions
   setOfflineStatus: (isOffline: boolean) => void;
   setActiveNoteId: (id: string | null) => void;
   setActiveFolderId: (id: string | null) => void;
   setActiveCategoryId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
+  setActiveAiTool: (tool: string | null) => void;
 }
 
 const DEFAULT_CATEGORIES: Category[] = [
@@ -165,11 +206,18 @@ export const useStore = create<AppState>()(
       categories: DEFAULT_CATEGORIES,
       folders: [],
       revisionLogs: [],
+      coins: 0,
+      earnedAchievements: [],
+      weeklyChallenge: null,
+      dailyGoal: 5,
+      dailyProgress: 0,
+      lastDailyReset: new Date().toISOString().split('T')[0],
       isOffline: false,
       activeNoteId: null,
       activeFolderId: null,
       activeCategoryId: null,
       searchQuery: '',
+      activeAiTool: null,
 
       toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
       setTheme: (theme) => set({ theme }),
@@ -333,11 +381,39 @@ export const useStore = create<AppState>()(
       }),
       setRevisionLogs: (revisionLogs) => set({ revisionLogs }),
 
+      // Gamification Actions
+      addCoins: (amount) => set((state) => ({ coins: state.coins + amount })),
+      spendCoins: (amount) => {
+        const state = get();
+        if (state.coins < amount) return false;
+        set({ coins: state.coins - amount });
+        return true;
+      },
+      earnAchievement: (id) => set((state) => ({
+        earnedAchievements: state.earnedAchievements.includes(id) ? state.earnedAchievements : [...state.earnedAchievements, id]
+      })),
+      setWeeklyChallenge: (challenge) => set({ weeklyChallenge: challenge }),
+      updateWeeklyProgress: (amount) => set((state) => ({
+        weeklyChallenge: state.weeklyChallenge ? { ...state.weeklyChallenge, progress: state.weeklyChallenge.progress + amount } : state.weeklyChallenge
+      })),
+      incrementDailyProgress: (amount) => set((state) => ({
+        dailyProgress: state.dailyProgress + amount
+      })),
+      resetDailyProgress: () => set({ dailyProgress: 0, lastDailyReset: new Date().toISOString().split('T')[0] }),
+      checkAndResetDaily: () => set((state) => {
+        const today = new Date().toISOString().split('T')[0];
+        if (state.lastDailyReset !== today) {
+          return { dailyProgress: 0, lastDailyReset: today };
+        }
+        return {};
+      }),
+
       setOfflineStatus: (isOffline) => set({ isOffline }),
       setActiveNoteId: (id) => set({ activeNoteId: id }),
       setActiveFolderId: (id) => set({ activeFolderId: id, activeCategoryId: null }), // filter priority folder
       setActiveCategoryId: (id) => set({ activeCategoryId: id, activeFolderId: null }), // filter priority category
       setSearchQuery: (query) => set({ searchQuery: query }),
+      setActiveAiTool: (tool) => set({ activeAiTool: tool }),
     }),
     {
       name: 'studysnap-store',
@@ -349,6 +425,12 @@ export const useStore = create<AppState>()(
         categories: state.categories,
         folders: state.folders,
         revisionLogs: state.revisionLogs,
+        coins: state.coins,
+        earnedAchievements: state.earnedAchievements,
+        weeklyChallenge: state.weeklyChallenge,
+        dailyGoal: state.dailyGoal,
+        dailyProgress: state.dailyProgress,
+        lastDailyReset: state.lastDailyReset,
       }),
     }
   )

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import PwaRegister from "@/components/PwaRegister";
 import ClerkCleaner from "@/components/ClerkCleaner";
+import ThemeSync from "@/components/ThemeSync";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -54,6 +55,7 @@ export default function RootLayout({
           <meta name="author" content="Suraj Bhan Pratap Singh - Full-Stack AI Engineer" />
         </head>
         <body>
+          <ThemeSync />
           <PwaRegister />
           <ClerkCleaner />
           {children}
