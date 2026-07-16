@@ -1,149 +1,206 @@
-<div align="center">
+<p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="FRONTEND/public/studysnap-logo.svg">
-    <img src="FRONTEND/public/studysnap-logo.svg" width="80" alt="StudySnap">
+    <img src="FRONTEND/public/studysnap-logo.svg" width="90" height="90" alt="StudySnap">
   </picture>
-  <h1 style="font-size: 2.8em; margin: 8px 0 0; letter-spacing: -1px; background: linear-gradient(135deg, #0061A4, #10B981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-    StudySnap
-  </h1>
-  <p style="font-size: 1.15em; color: #666; margin-bottom: 20px;">
-    <strong>Your Intelligent Study Companion</strong><br>
-    Create · Organize · Listen · Revise · Conquer
-  </p>
-  <p>
-    <a href="https://studysnap-sigma.vercel.app/" target="_blank">
-      <img src="https://img.shields.io/badge/LIVE_DEMO-0061A4?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo">
-    </a>
-  </p>
-  <p>
-    <img src="https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=next.js&logoColor=white" alt="Next.js 16">
-    <img src="https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white" alt="Express.js">
-    <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
-    <img src="https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19">
-    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL">
-    <img src="https://img.shields.io/badge/Clerk-6C47FF?style=flat-square&logo=clerk&logoColor=white" alt="Clerk Auth">
-    <img src="https://img.shields.io/badge/Groq-10B981?style=flat-square&logo=llama&logoColor=white" alt="Groq AI">
-    <img src="https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
-    <img src="https://img.shields.io/badge/Drizzle-1B1B1F?style=flat-square&logo=drizzle&logoColor=white" alt="Drizzle ORM">
-    <img src="https://img.shields.io/badge/Zustand-7C3AED?style=flat-square&logo=react&logoColor=white" alt="Zustand">
-    <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT">
-  </p>
-</div>
+</p>
 
-<br>
+<h1 align="center">StudySnap</h1>
 
----
+<p align="center">
+  <strong>Your Intelligent Study Companion</strong><br>
+  Create · Organize · Revise · Conquer
+</p>
 
-## 📋 Table of Contents
+<p align="center">
+  <a href="https://studysnap-sigma.vercel.app/" target="_blank">
+    <img src="https://img.shields.io/badge/LIVE_DEMO-0061A4?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo">
+  </a>
+  <a href="https://github.com/surajrajput999/StudySnap" target="_blank">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+</p>
 
-- [✨ Features](#-features)
-- [🎥 Screenshots](#-screenshots)
-- [🏗️ Architecture](#️-architecture)
-- [⚡ Quick Start](#-quick-start)
-- [🔧 Tech Stack](#-tech-stack)
-- [📖 API Overview](#-api-overview)
-- [🧪 Commands](#-commands)
-- [🌍 Deployment](#-deployment)
-- [🤝 Contributing](#-contributing)
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-1.0.0-0061A4?style=flat-square&labelColor=1a1d23" alt="Version">
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square&labelColor=1a1d23" alt="License">
+  <img src="https://img.shields.io/github/stars/surajrajput999/StudySnap?style=flat-square&logo=github&label=Stars&labelColor=1a1d23" alt="Stars">
+  <img src="https://img.shields.io/badge/PRs-Welcome-7C3AED?style=flat-square&labelColor=1a1d23" alt="PRs Welcome">
+  <img src="https://img.shields.io/badge/Maintained-Yes-10B981?style=flat-square&labelColor=1a1d23" alt="Maintained">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=next.js&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white" alt="Express">
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Drizzle_ORM-1B1B1F?style=flat-square&logo=drizzle&logoColor=white" alt="Drizzle">
+  <img src="https://img.shields.io/badge/Clerk-6C47FF?style=flat-square&logo=clerk&logoColor=white" alt="Clerk">
+  <img src="https://img.shields.io/badge/Groq_LLaMA-10B981?style=flat-square&logo=llama&logoColor=white" alt="Groq">
+  <img src="https://img.shields.io/badge/Zustand-7C3AED?style=flat-square&logo=react&logoColor=white" alt="Zustand">
+  <img src="https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
+</p>
 
 ---
 
-## ✨ Features
+## ✨ Demo
 
-<div align="center">
-
-| | Feature | Description |
-|---|---------|-------------|
-| 🎯 | **Elite Dashboard** | Personalized greeting, streak tracking, stats bar, 24 pre-loaded subjects, custom folders, full-text search, pin/favorite system, grid/list view toggle — all with staggered animations |
-| 📝 | **Advanced Note Editor** | Rich text editing with auto-save, text-to-speech (listen aloud), speech-to-text (voice dictation), hashtag system, PIN lock security, PDF export, TXT/MD import |
-| 🎙️ | **Voice Notes** | Record audio notes with pause/resume, variable playback speed (0.5×–2×), real-time speech-to-text transcription, link recordings to existing notes |
-| 🤖 | **AI Assistant** | Chat with Groq LLaMA-3.1, one-click note summarization, interactive MCQ quiz generator with explanations, flip flashcards, Hindi ↔ English translation — all with confetti celebrations! |
-| 📅 | **Smart Revision** | Spaced repetition algorithm with Easy/Medium/Hard ratings, visual revision calendar, daily reminders, streak tracking, revision history logs |
-| 👤 | **Student Profile** | Customizable profile — name, school/college, field of study, class/semester, study goals, interactive Leaflet study zones map, stats dashboard |
-| 🎨 | **Premium UI** | Material Design 3 design system, glassmorphism effects, gradient cards, smooth staggered animations, seamless dark/light mode toggle, responsive mobile-first layout |
-| 📱 | **PWA Offline** | Full progressive web app — service worker caching, installable on mobile/desktop home screen, works offline with cached notes, manifest.json support |
-
-</div>
+<p align="center">
+  <img src="screenshots/dashboard-desktop.png" alt="StudySnap Demo" width="800" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+</p>
 
 ---
 
-## 🎥 Screenshots
+## 📸 Screenshot Gallery
 
-<div align="center">
+<p align="center">
+  <img src="screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="49%" style="border-radius: 8px;">
+  <img src="screenshots/dashboard-dark.png" alt="Dark Mode" width="49%" style="border-radius: 8px;">
+</p>
 
-### Dashboard
+<p align="center">
+  <img src="screenshots/ai-desktop.png" alt="AI Assistant" width="32%" style="border-radius: 8px;">
+  <img src="screenshots/editor-desktop.png" alt="Note Editor" width="32%" style="border-radius: 8px;">
+  <img src="screenshots/dashboard-mobile.png" alt="Mobile View" width="32%" style="border-radius: 8px;">
+</p>
 
-| Desktop | Mobile | Dark Mode |
-|---------|--------|-----------|
-| <img src="screenshots/dashboard-desktop.png" alt="Desktop Dashboard" width="380"> | <img src="screenshots/dashboard-mobile.png" alt="Mobile Dashboard" width="120"> | <img src="screenshots/dashboard-dark.png" alt="Dark Mode Dashboard" width="380"> |
+---
 
-### Feature Modules
+## 🚀 Features
 
-| Note Editor | Voice Notes | AI Assistant |
-|-------------|-------------|--------------|
-| <img src="screenshots/editor-desktop.png" alt="Note Editor" width="250"> | <img src="screenshots/voice-desktop.png" alt="Voice Notes" width="250"> | <img src="screenshots/ai-desktop.png" alt="AI Assistant" width="250"> |
-
-| Revision Calendar | Profile & Stats |
-|-------------------|-----------------|
-| <img src="screenshots/revision-desktop.png" alt="Revision Calendar" width="250"> | <img src="screenshots/profile-desktop.png" alt="Profile" width="250"> |
-
-</div>
+<table align="center">
+  <tr>
+    <td align="center" width="100"><b>🤖 AI</b></td>
+    <td>Groq LLaMA-3.1 chat · One-click summarization · MCQ quiz generator · Flip flashcards · Hindi ↔ English translation</td>
+  </tr>
+  <tr>
+    <td align="center"><b>📝 Notes</b></td>
+    <td>Rich text editing · Auto-save · PIN lock security · PDF export · TXT/MD import · Hashtag system · Grid/list view</td>
+  </tr>
+  <tr>
+    <td align="center"><b>🎙️ Voice</b></td>
+    <td>Record with pause/resume · Variable playback (0.5×–2×) · Real-time speech-to-text transcription · Link to notes</td>
+  </tr>
+  <tr>
+    <td align="center"><b>📅 Revision</b></td>
+    <td>Spaced repetition algorithm · Easy/Medium/Hard ratings · Visual calendar · Streak tracking · Revision history logs</td>
+  </tr>
+  <tr>
+    <td align="center"><b>📄 PDF</b></td>
+    <td>AI PDF assistant · Analyze and summarize documents · Extract key information · Export notes to PDF</td>
+  </tr>
+  <tr>
+    <td align="center"><b>🔒 Security</b></td>
+    <td>Clerk OAuth · JWT session verification · PIN-locked notes · CSRF protection · Rate limiting · Helmet headers</td>
+  </tr>
+  <tr>
+    <td align="center"><b>📱 PWA</b></td>
+    <td>Installable on home screen · Service worker caching · Offline access · Manifest.json · Native app feel</td>
+  </tr>
+</table>
 
 ---
 
 ## 🏗️ Architecture
 
+```mermaid
+flowchart TB
+    User["👤 User"]
+    Frontend["🖥️ Frontend<br/>Next.js 16 + React 19<br/>Vercel"]
+    Backend["⚙️ Backend<br/>Express.js + TypeScript<br/>Render"]
+    Groq["🧠 Groq AI<br/>LLaMA-3.1-8B"]
+    DB[("🗄️ PostgreSQL<br/>Neon Serverless")]
+    Storage["☁️ Cloudinary<br/>Audio Storage"]
+    Cache["⚡ Upstash Redis<br/>Cache & Queue"]
+    Email["📧 Brevo<br/>Email Service"]
+
+    User --> Frontend
+    Frontend -->|"apiFetch(token)"| Backend
+    Backend -->|"groq-sdk"| Groq
+    Backend -->|"Drizzle ORM"| DB
+    Backend -->|"Upload API"| Storage
+    Backend -->|"Rate Limit"| Cache
+    Backend -->|"SMTP"| Email
+```
+
+---
+
+## 📦 Tech Stack
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Zustand-7C3AED?style=for-the-badge&logo=react&logoColor=white" alt="Zustand">
+  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express">
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Drizzle_ORM-1B1B1F?style=for-the-badge&logo=drizzle&logoColor=white" alt="Drizzle">
+  <img src="https://img.shields.io/badge/Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk">
+  <img src="https://img.shields.io/badge/Groq_LLaMA-10B981?style=for-the-badge&logo=llama&logoColor=white" alt="Groq">
+  <img src="https://img.shields.io/badge/Redis-FF4438?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+  <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white" alt="Cloudinary">
+  <img src="https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=white" alt="Razorpay">
+  <img src="https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA">
+  <img src="https://img.shields.io/badge/MD3-0061A4?style=for-the-badge&logo=materialdesign&logoColor=white" alt="Material Design 3">
+  <img src="https://img.shields.io/badge/Framer-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion">
+</p>
+
+---
+
+## 📁 Folder Structure
+
 ```
 studysnap/
-├── FRONTEND/                          # Next.js 16 + React 19 + TypeScript
+├── FRONTEND/                            # Next.js 16 + React 19
 │   ├── app/
-│   │   ├── page.tsx                   # Main layout — glassmorphism header, sidebar, content, mobile nav
-│   │   └── globals.css                # Premium MD3 design tokens, glassmorphism, animations, card system
+│   │   ├── page.tsx                     # Main SPA layout
+│   │   ├── layout.tsx                   # Root layout + Clerk provider
+│   │   └── globals.css                  # MD3 design system
 │   ├── components/
-│   │   ├── HomeScreen.tsx             # Dashboard — hero, stats, search, 24 subjects, folders, notes grid/list
-│   │   ├── NoteEditor.tsx             # Full editor — auto-save, TTS/STT, PIN lock, PDF export, tags
-│   │   ├── VoiceNotes.tsx            # Audio recording — pause/resume, playback speed, real-time transcription
-│   │   ├── AiHelper.tsx              # AI companion — chat, summarizer, MCQ quiz, flashcards, translator
-│   │   ├── RevisionCalendar.tsx      # Spaced repetition scheduler with visual calendar
-│   │   └── ProfileView.tsx           # Student profile — stats, edit form, Leaflet study zones map
+│   │   ├── HomeScreen.tsx               # Dashboard with hero, stats, notes
+│   │   ├── NoteEditor.tsx               # Rich text editor with auto-save
+│   │   ├── VoiceNotes.tsx              # Audio recorder + transcription
+│   │   ├── AiTutor.tsx                 # AI chat with streaming
+│   │   ├── AiHelper.tsx                # Summarize, MCQs, flashcards
+│   │   ├── RevisionCalendar.tsx        # Spaced repetition scheduler
+│   │   ├── GamificationHub.tsx         # Achievements, XP, leaderboard
+│   │   ├── ProfileView.tsx             # Student profile + study zones
+│   │   ├── MobileDrawer.tsx            # MD3 navigation drawer
+│   │   ├── HeroAI.tsx                  # AI landing hero section
+│   │   └── EmptyState.tsx              # Empty state illustrations
 │   ├── lib/
-│   │   ├── store/useStore.ts         # Zustand store — 24 default subjects, user, notes, voice notes, revision
-│   │   └── config.ts                 # API config + apiFetch helper with Clerk auth token
+│   │   ├── store/useStore.ts            # Zustand persisted store
+│   │   └── config.ts                   # API config + apiFetch helper
 │   ├── public/
-│   │   ├── window.svg                # App logo (lightbulb + open book)
-│   │   ├── studysnap-logo.svg        # 400×400 full logo
-│   │   ├── manifest.json             # PWA manifest
-│   │   └── sw.js                     # Service worker for offline caching
-│   └── docs/                         # Architecture, API, deployment, tech stack docs
+│   │   ├── window.svg                  # App icon
+│   │   ├── studysnap-logo.svg          # Full logo
+│   │   └── manifest.json              # PWA manifest
+│   └── docs/
 │
-├── BACKEND/                           # Express.js + TypeScript API
+├── BACKEND/                             # Express.js + TypeScript
 │   └── src/
-│       ├── routes/                    # RESTful endpoints — notes, voice-notes, ai, revision, webhooks
-│       ├── services/                  # Business logic — Groq AI chat/summarize/MCQ/translate, email, payments
-│       ├── middleware/                # Clerk auth, rate limiting (20 req/min AI), Helmet security, CORS, CSRF
-│       ├── db/                        # Drizzle ORM schema + migrations + Neon PostgreSQL connection
-│       └── config/env.ts             # Zod-validated environment config
+│       ├── index.ts                    # Server entry + middleware
+│       ├── routes/                     # REST API endpoints
+│       │   ├── ai.ts                   # /api/ai/* — Groq integration
+│       │   ├── notes.ts                # /api/notes/* — CRUD
+│       │   ├── voiceNotes.ts           # /api/voice-notes/*
+│       │   ├── revision.ts            # /api/revision/*
+│       │   └── webhooks.ts            # External webhooks
+│       ├── services/                   # Business logic
+│       │   ├── ai.ts                   # Groq chat, summarize, MCQ, translate
+│       │   ├── email.ts               # Brevo transactional emails
+│       │   └── storage.ts             # Cloudinary uploads
+│       ├── middleware/
+│       │   ├── auth.ts                # Clerk JWT verification
+│       │   ├── security.ts            # CORS, Helmet, CSRF
+│       │   └── rateLimiter.ts         # 20 req/min AI limit
+│       ├── db/                         # Drizzle ORM schema + migrations
+│       ├── config/env.ts              # Environment config
+│       └── types/                      # TypeScript interfaces
 │
-├── package.json                       # Root scripts — dev, build, lint, install:all
-└── .env.example                       # Environment variable template
-```
-
-### Data Flow
-
-```
-Client (Next.js)
-  │
-  ├── Clerk Auth ──► Session Token
-  │
-  └── apiFetch(token) ──► Express Backend (port 4000)
-          │
-          ├── authMiddleware ──► JWT verification
-          ├── rateLimiter ────► 20 req/min per IP
-          │
-          ├── /api/notes ──────► Neon PostgreSQL + Drizzle ORM
-          ├── /api/voice-notes ► Cloudinary audio storage
-          ├── /api/ai ─────────► Groq LLaMA-3.1 API
-          └── /api/revision ───► Spaced repetition logic
+├── .env.example                        # Environment template
+└── package.json                        # Root scripts
 ```
 
 ---
@@ -154,9 +211,9 @@ Client (Next.js)
 
 - **Node.js** ≥ 20.x
 - **npm** ≥ 10.x
-- A [Clerk](https://clerk.com) account (for authentication)
-- A [Groq](https://groq.com) API key (for AI features)
-- A [Neon](https://neon.tech) PostgreSQL database (optional — mock mode available)
+- [Clerk](https://clerk.com) account for authentication
+- [Groq](https://groq.com) API key for AI features
+- [Neon](https://neon.tech) PostgreSQL database (optional — mock mode available)
 
 ### Setup
 
@@ -165,134 +222,145 @@ Client (Next.js)
 git clone https://github.com/surajrajput999/StudySnap.git
 cd StudySnap
 
-# 2. Install all dependencies (frontend + backend)
+# 2. Install all dependencies
 npm run install:all
 
 # 3. Configure environment variables
 cp .env.example BACKEND/.env
 cp FRONTEND/.env.local.example FRONTEND/.env.local
 
-# 4. Start both servers in development mode
+# 4. Start development servers
 npm run dev
 ```
-
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | ✅ | Clerk publishable key (frontend) |
-| `CLERK_SECRET_KEY` | ✅ | Clerk secret key (both) |
-| `NEXT_PUBLIC_BACKEND_URL` | ✅ | Backend URL (default: `http://localhost:4000`) |
-| `GROQ_API_KEY` | ✅ | Groq API key for AI features |
-| `DATABASE_URL` | ❌ | Neon PostgreSQL connection string |
-| `CLOUDINARY_*` | ❌ | Cloudinary media storage config |
-| `BREVO_API_KEY` | ❌ | Brevo transactional email API key |
-| `UPSTASH_REDIS_*` | ❌ | Redis cache config |
-
-> **Note:** The app works in **mock mode** without `GROQ_API_KEY` — AI features return sample data.
 
 ### Access
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | http://localhost:3000 |
-| **Backend** | http://localhost:4000 |
-| **Health Check** | http://localhost:4000/api/health |
+| **Frontend** | `http://localhost:3000` |
+| **Backend** | `http://localhost:4000` |
+| **Health Check** | `http://localhost:4000/api/health` |
 
 ---
 
-## 🔧 Tech Stack
+## 🔐 Environment Variables
 
-| Category | Technology | Purpose |
-|----------|-----------|---------|
-| **Frontend Framework** | Next.js 16 + React 19 | SSR, App Router, server/client components |
-| **Language** | TypeScript | End-to-end type safety |
-| **State Management** | Zustand (persist middleware) | localStorage-persisted global store |
-| **Backend** | Express.js + TypeScript | RESTful API server |
-| **Database** | Neon PostgreSQL + Drizzle ORM | Serverless SQL with type-safe queries |
-| **Authentication** | Clerk | OAuth, magic links, session management |
-| **AI / LLM** | Groq (LLaMA-3.1-8B) | Chat, summarization, MCQ generation, flashcards, translation |
-| **Cache** | Upstash Redis | Rate limiting, session cache |
-| **Media Storage** | Cloudinary | Voice note audio hosting |
-| **Email** | Brevo (Sendinblue) | Transactional emails |
-| **Queue** | BullMQ (Redis-backed) | Background job processing |
-| **Security** | Helmet, CORS, Rate Limiting | HTTP headers, cross-origin, brute-force protection |
-| **Maps** | Leaflet + OpenStreetMap | Study zone location display |
-| **PWA** | Web Manifest + Service Worker | Offline support, installable app |
-| **Payments** | Razorpay | Order creation, payment verification |
-| **Design System** | Material Design 3 | Glassmorphism, elevation, custom properties, animations |
+### Backend (`BACKEND/.env`)
 
----
+```env
+# Required
+GROQ_API_KEY=gsk_xxx                  # Groq AI API key
+CLERK_SECRET_KEY=sk_test_xxx          # Clerk secret key
+FRONTEND_URL=http://localhost:3000     # CORS origin (use Vercel URL in prod)
+NODE_ENV=development                  # Set "production" on Render
 
-## 📖 API Overview
+# Database
+DATABASE_URL=postgresql://...         # Neon PostgreSQL connection
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `GET` | `/api/health` | Server health & service status | No |
-| `GET` | `/api/notes` | List all notes | Yes |
-| `POST` | `/api/notes` | Create a new note | Yes |
-| `GET` | `/api/notes/:id` | Get note by ID | Yes |
-| `PATCH` | `/api/notes/:id` | Update note | Yes |
-| `DELETE` | `/api/notes/:id` | Delete note | Yes |
-| `GET` | `/api/notes/categories` | List categories | Yes |
-| `POST` | `/api/ai/chat` | AI chat completion | Yes |
-| `POST` | `/api/ai/summarize` | Summarize note content | Yes |
-| `POST` | `/api/ai/mcqs` | Generate MCQs or flashcards | Yes |
-| `POST` | `/api/ai/translate` | Translate note content | Yes |
-| `POST` | `/api/voice-notes` | Upload voice note | Yes |
-| `GET` | `/api/voice-notes` | List voice notes | Yes |
-| `POST` | `/api/revision/mark` | Mark note as revised | Yes |
-| `GET` | `/api/revision/logs` | Get revision history | Yes |
-| `POST` | `/api/payments/create-order` | Create Razorpay order | Yes |
-| `POST` | `/api/payments/verify` | Verify payment | Yes |
+# Optional
+CLOUDINARY_CLOUD_NAME=xxx
+CLOUDINARY_API_KEY=xxx
+CLOUDINARY_API_SECRET=xxx
+UPSTASH_REDIS_URL=https://xxx.upstash.io
+UPSTASH_REDIS_TOKEN=xxx
+BREVO_API_KEY=xxx
+BREVO_SENDER_EMAIL=study@notes.ai
+```
 
----
+### Frontend (`FRONTEND/.env.local`)
 
-## 🧪 Commands
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start frontend (port 3000) + backend (port 4000) concurrently |
-| `npm run build` | Build both frontend + backend for production |
-| `npm run start` | Start production servers |
-| `npm run lint` | Lint frontend code |
-| `npm run install:all` | Install deps for root + FRONTEND + BACKEND |
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
+CLERK_SECRET_KEY=sk_test_xxx
+NEXT_PUBLIC_BACKEND_URL=http://localhost:4000  # Render URL in production
+```
 
 ---
 
 ## 🌍 Deployment
 
-### Frontend (Vercel)
+### Frontend → Vercel
 
-The frontend is deployed at:
-<p>
-  <a href="https://studysnap-sigma.vercel.app/" target="_blank">
-    <img src="https://img.shields.io/badge/LIVE-https://studysnap--sigma.vercel.app-0061A4?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo">
-  </a>
-</p>
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-Environment variables required on Vercel:
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-- `CLERK_SECRET_KEY`
-- `NEXT_PUBLIC_BACKEND_URL` (set to your deployed backend URL)
+1. Connect your GitHub repository
+2. Set framework to **Next.js**
+3. Add environment variables:
+   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+   - `CLERK_SECRET_KEY`
+   - `NEXT_PUBLIC_BACKEND_URL` → your Render backend URL
+4. Deploy
 
-### Backend (Any Node.js host)
+### Backend → Render
 
-Deploy `BACKEND/` to Railway, Render, Fly.io, or any Node.js host.
+1. Create a new **Web Service** from your repository
+2. Set **Root Directory** to `BACKEND`
+3. Set **Build Command** to `npm install && npm run build`
+4. Set **Start Command** to `npm start`
+5. Add environment variables:
+   - `NODE_ENV=production`
+   - `GROQ_API_KEY`, `CLERK_SECRET_KEY`, `FRONTEND_URL`, `DATABASE_URL`
+6. Deploy
 
-Required environment variables:
-- `PORT`, `NODE_ENV`
-- `CLERK_SECRET_KEY`
-- `GROQ_API_KEY`
-- `DATABASE_URL` (Neon PostgreSQL)
-- `FRONTEND_URL` (your deployed frontend URL, for CORS)
-- `CLOUDINARY_*`, `BREVO_API_KEY`, `UPSTASH_REDIS_*` (optional)
+---
+
+## ⚡ Performance
+
+<table align="center">
+  <tr>
+    <td align="center">📱 <b>Responsive</b></td>
+    <td>Mobile · Tablet · Desktop — three distinct layouts via CSS Grid</td>
+  </tr>
+  <tr>
+    <td align="center">📦 <b>PWA</b></td>
+    <td>Installable · Service worker · Offline caching · Manifest.json</td>
+  </tr>
+  <tr>
+    <td align="center">🎨 <b>MD3</b></td>
+    <td>Material Design 3 tokens · Glassmorphism · Elevation system · Dark mode</td>
+  </tr>
+  <tr>
+    <td align="center">⚡ <b>Lazy Loading</b></td>
+    <td>Code splitting · Dynamic imports · Framer Motion staggered animations</td>
+  </tr>
+  <tr>
+    <td align="center">🛡️ <b>Security</b></td>
+    <td>Clerk auth · Helmet · CORS · CSRF · Rate limiting (20 req/min AI)</td>
+  </tr>
+</table>
+
+---
+
+## 🗺️ Roadmap
+
+<table align="center">
+  <tr>
+    <th>Version</th>
+    <th>Features</th>
+    <th>Status</th>
+  </tr>
+  <tr>
+    <td><b>v1.0</b></td>
+    <td>AI Assistant · Note Editor · Voice Notes · Revision Calendar · Gamification · PWA · Dark Mode</td>
+    <td>✅ <b>Released</b></td>
+  </tr>
+  <tr>
+    <td><b>v1.1</b></td>
+    <td>Offline mode · Analytics dashboard · Collaborative notes · AI mind maps · Flashcards import/export</td>
+    <td>🔄 <b>In Progress</b></td>
+  </tr>
+  <tr>
+    <td><b>v2.0</b></td>
+    <td>Mobile native apps (iOS/Android) · Real-time collaboration · Study groups · AI-generated practice tests · API marketplace</td>
+    <td>📋 <b>Planned</b></td>
+  </tr>
+</table>
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
+Contributions make the open-source community an amazing place to learn and grow. Any contributions are **greatly appreciated**.
 
 1. **Fork** the repository
 2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
@@ -300,28 +368,48 @@ Contributions are welcome! Here's how you can help:
 4. **Push** to the branch (`git push origin feature/amazing-feature`)
 5. **Open** a Pull Request
 
-Please ensure your code follows the existing style conventions and passes lint checks.
+> Please ensure your code follows existing style conventions and passes lint checks.
 
 ---
 
-<div align="center">
-  <br>
-  <img src="FRONTEND/public/studysnap-logo.svg" width="48" alt="StudySnap">
+## 📄 License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+---
+
+## 👤 Author
+
+<p align="center">
+  <strong>Suraj Bhan Pratap Singh</strong><br>
+  Full-Stack AI Engineer
+</p>
+
+<p align="center">
+  <a href="https://github.com/surajrajput999">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+  <a href="https://www.linkedin.com/in/suraj-bhan-pratap-singh-913a67267/">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
+  </a>
+  <a href="https://surajkumar.vercel.app/">
+    <img src="https://img.shields.io/badge/Portfolio-0061A4?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio">
+  </a>
+</p>
+
+---
+
+<p align="center">
+  <img src="FRONTEND/public/studysnap-logo.svg" width="48" height="48" alt="StudySnap"><br><br>
+  <strong>Built with ❤️ for students by Suraj</strong><br><br>
+  <a href="https://github.com/surajrajput999/StudySnap/issues">Report Bug</a>
+  ·
+  <a href="https://github.com/surajrajput999/StudySnap/issues">Request Feature</a>
+  ·
+  <a href="https://studysnap-sigma.vercel.app/">Live Demo</a>
   <br><br>
-  <p>
-    Built with ❤️ by
-    <a href="https://github.com/surajrajput999"><strong>Suraj Bhan Pratap Singh</strong></a>
-  </p>
-  <p>
-    <a href="https://github.com/surajrajput999/StudySnap/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/surajrajput999/StudySnap/issues">Request Feature</a>
-    ·
-    <a href="https://studysnap-sigma.vercel.app/">Live Demo</a>
-  </p>
-  <p>
-    <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License">
-    <img src="https://img.shields.io/badge/maintained-yes-10B981?style=flat-square" alt="Maintained">
-    <img src="https://img.shields.io/badge/PRs-welcome-7C3AED?style=flat-square" alt="PRs Welcome">
-  </p>
-</div>
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT">
+  <img src="https://img.shields.io/badge/maintained-yes-10B981?style=flat-square" alt="Maintained">
+  <img src="https://img.shields.io/badge/PRs-welcome-7C3AED?style=flat-square" alt="PRs Welcome">
+  <img src="https://img.shields.io/badge/⭐-Star_this_repo-0061A4?style=flat-square" alt="Star">
+</p>
