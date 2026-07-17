@@ -117,10 +117,67 @@ export default function AiTutor() {
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [attachedFile, setAttachedFile] = useState<{ name: string; content: string } | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  useEffect(() => {
+    document.body.classList.add('ai-active');
+    return () => document.body.classList.remove('ai-active');
+  }, []);
+
+  useEffect(() => {
+    if (chatEndRef.current && !messages.some(m => m.isStreaming)) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const root = document.documentElement;
+    let previousKb = 0;
+
+    const onViewportChange = () => {
+      const kbHeight = Math.max(0, window.innerHeight - vv.height);
+      const isOpen = kbHeight > 80;
+
+      root.style.setProperty('--viewport-height', `${vv.height}px`);
+      root.style.setProperty('--keyboard-h', `${kbHeight}px`);
+      root.classList.toggle('keyboard-open', isOpen);
+
+      root.style.setProperty('--chat-pb', isOpen ? `${kbHeight}px` : '0px');
+
+      if (isOpen && kbHeight !== previousKb) {
+        scrollToBottom();
+      }
+
+      previousKb = kbHeight;
+    };
+
+    onViewportChange();
+    vv.addEventListener('resize', onViewportChange);
+    vv.addEventListener('scroll', onViewportChange);
+
+    return () => {
+      vv.removeEventListener('resize', onViewportChange);
+      vv.removeEventListener('scroll', onViewportChange);
+      root.classList.remove('keyboard-open');
+      root.style.removeProperty('--viewport-height');
+      root.style.removeProperty('--keyboard-h');
+      root.style.removeProperty('--chat-pb');
+    };
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    });
+  }, []);
 
   const addStreamingMessage = useCallback((content: string) => {
     setMessages(prev => {
@@ -130,7 +187,8 @@ export default function AiTutor() {
       }
       return [...prev, { role: 'assistant', content, isStreaming: true }];
     });
-  }, []);
+    scrollToBottom();
+  }, [scrollToBottom]);
 
   const finalizeStreaming = useCallback(() => {
     setMessages(prev => {
@@ -140,7 +198,8 @@ export default function AiTutor() {
       }
       return prev;
     });
-  }, []);
+    scrollToBottom();
+  }, [scrollToBottom]);
 
   const handleSend = async (text?: string) => {
     const msg = (text || input).trim();
@@ -151,6 +210,7 @@ export default function AiTutor() {
     const userMsg: Message = { role: 'user', content: msg };
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
+    scrollToBottom();
 
     const contextMessages = [...messages, userMsg].map(m => ({
       role: m.role,
@@ -166,9 +226,8 @@ export default function AiTutor() {
 
       if (data.success) {
         const fullResponse = data.message?.content || data.response || data.text || JSON.stringify(data);
-        let stopStream: (() => void) | null = null;
 
-        stopStream = streamText(
+        streamText(
           fullResponse,
           (chunk) => addStreamingMessage(chunk),
           () => {
@@ -238,13 +297,8 @@ export default function AiTutor() {
   const handleAttachFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.type === 'application/pdf') {
-      const text = await file.text();
-      setAttachedFile({ name: file.name, content: text.slice(0, 5000) });
-    } else {
-      const text = await file.text();
-      setAttachedFile({ name: file.name, content: text.slice(0, 5000) });
-    }
+    const text = await file.text();
+    setAttachedFile({ name: file.name, content: text.slice(0, 5000) });
     setShowAttachMenu(false);
   };
 
@@ -255,8 +309,14 @@ export default function AiTutor() {
     }
   };
 
+  const handleInputFocus = () => {
+    setTimeout(scrollToBottom, 350);
+  };
+
+  const hasMessages = messages.length > 1;
+
   return (
-    <div className="tutor-container">
+    <div className="tutor-container" ref={containerRef}>
       <div className="tutor-header">
         <div className="tutor-header-left">
           <div className="tutor-avatar">
@@ -273,22 +333,24 @@ export default function AiTutor() {
         </div>
       </div>
 
-      <div className="tutor-chips">
-        {QUICK_CHIPS.map(chip => (
-          <button
-            key={chip.id}
-            className="tutor-chip"
-            onClick={() => handleQuickChip(chip)}
-            disabled={isLoading}
-            style={{ '--chip-color': chip.color } as React.CSSProperties}
-          >
-            <chip.icon size={14} />
-            {chip.label}
-          </button>
-        ))}
-      </div>
+      <div className="tutor-chat" ref={chatContainerRef}>
+        {!hasMessages && (
+          <div className="tutor-chips">
+            {QUICK_CHIPS.map(chip => (
+              <button
+                key={chip.id}
+                className="tutor-chip"
+                onClick={() => handleQuickChip(chip)}
+                disabled={isLoading}
+                style={{ '--chip-color': chip.color } as React.CSSProperties}
+              >
+                <chip.icon size={14} />
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        )}
 
-      <div className="tutor-chat">
         {messages.map((msg, idx) => (
           <div key={idx} className={`tutor-message tutor-message-${msg.role}`}>
             <div className="tutor-message-avatar">
@@ -353,7 +415,7 @@ export default function AiTutor() {
         <div ref={chatEndRef} />
       </div>
 
-      {attachedFile && (
+      {hasMessages && attachedFile && (
         <div className="tutor-attached">
           <Paperclip size={14} />
           <span className="tutor-attached-name">{attachedFile.name}</span>
@@ -363,15 +425,30 @@ export default function AiTutor() {
         </div>
       )}
 
-      <div className="tutor-input-bar">
-        <div className="tutor-input-actions">
+      <div className="tutor-input-area">
+        <div className="tutor-input-bar">
           <button
             className="tutor-input-btn"
             onClick={() => setShowAttachMenu(!showAttachMenu)}
             title="Attach file"
           >
-            <Paperclip size={18} />
+            <Paperclip size={20} />
           </button>
+          <div className="tutor-input-wrap">
+            <input
+              ref={inputRef}
+              type="text"
+              className="tutor-input"
+              placeholder="Ask your AI tutor anything..."
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={handleInputFocus}
+              disabled={isLoading}
+              autoCapitalize="off"
+              autoCorrect="off"
+            />
+          </div>
           <button
             className="tutor-input-btn"
             title="Voice input"
@@ -391,43 +468,33 @@ export default function AiTutor() {
               }
             }}
           >
-            <Mic size={18} />
+            <Mic size={20} />
+          </button>
+          <button
+            className="tutor-send-btn"
+            onClick={() => handleSend()}
+            disabled={!input.trim() || isLoading}
+          >
+            {isLoading ? <Loader2 size={20} className="tutor-spin" /> : <Send size={20} />}
           </button>
         </div>
-        <input
-          ref={inputRef}
-          type="text"
-          className="tutor-input"
-          placeholder="Ask your AI tutor anything..."
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={isLoading}
-        />
-        <button
-          className="tutor-send-btn"
-          onClick={() => handleSend()}
-          disabled={!input.trim() || isLoading}
-        >
-          {isLoading ? <Loader2 size={18} className="tutor-spin" /> : <Send size={18} />}
-        </button>
-      </div>
 
-      {showAttachMenu && (
-        <div className="tutor-attach-menu">
-          <button className="tutor-attach-option" onClick={() => fileInputRef.current?.click()}>
-            <Paperclip size={16} />
-            Upload PDF or Text
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.txt,.md,.json,.csv,.py,.js,.ts,.jsx,.tsx,.html,.css"
-            style={{ display: 'none' }}
-            onChange={handleAttachFile}
-          />
-        </div>
-      )}
+        {showAttachMenu && (
+          <div className="tutor-attach-menu">
+            <button className="tutor-attach-option" onClick={() => fileInputRef.current?.click()}>
+              <Paperclip size={16} />
+              Upload PDF or Text
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.txt,.md,.json,.csv,.py,.js,.ts,.jsx,.tsx,.html,.css"
+              style={{ display: 'none' }}
+              onChange={handleAttachFile}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

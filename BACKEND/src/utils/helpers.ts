@@ -16,7 +16,13 @@ export function generateId(): string {
 }
 
 export function sanitizeContent(content: string): string {
-  return content.replace(/<[^>]*>/g, '').trim();
+  return content
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
+    .replace(/on\w+\s*=\s*'[^']*'/gi, '')
+    .replace(/on\w+\s*=\s*\S+/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .trim();
 }
 
 export function formatDuration(seconds: number): string {

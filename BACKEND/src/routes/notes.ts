@@ -3,6 +3,8 @@ import { eq, and, desc } from 'drizzle-orm';
 import { getDb, notes } from '../db';
 import { authMiddleware } from '../middleware/auth';
 import { parseTags, generateId } from '../utils/helpers';
+import { hashPin, verifyPin } from '../utils/pin';
+import { validate, noteSchema, verifyPinSchema as verifyPinSchemaDef } from '../middleware/validate';
 import { cacheGet, cacheSet, cacheDel, invalidateUserCache } from '../services/cache';
 
 const router = Router();
@@ -26,12 +28,12 @@ router.get('/', async (req: Request, res: Response) => {
 
     const cached = await cacheGet<any[]>(cacheKey);
     if (cached) {
-      return res.json({ success: true, notes: cached });
+      return res.json({ success: true, notes: cached.map(stripPinLock) });
     }
 
     if (!getDb()) {
       const filtered = mockNotes.filter(n => n.userId === userId);
-      return res.json({ success: true, notes: filtered });
+      return res.json({ success: true, notes: filtered.map(stripPinLock) });
     }
 
     const dbNotes = await getDb()
@@ -41,20 +43,22 @@ router.get('/', async (req: Request, res: Response) => {
       .orderBy(desc(notes.isPinned), desc(notes.updatedAt));
 
     await cacheSet(cacheKey, dbNotes, 60);
-    res.json({ success: true, notes: dbNotes });
+    res.json({ success: true, notes: dbNotes.map(stripPinLock) });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Failed to fetch notes' });
   }
 });
 
-router.post('/', async (req: Request, res: Response) => {
+function stripPinLock(obj: any) {
+  if (!obj) return obj;
+  const { pinLock, ...rest } = obj;
+  return rest;
+}
+
+router.post('/', validate(noteSchema), async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
     const { id, title, content, tags, isPinned, isFavorite, pinLock, categoryId, folderId } = req.body;
-
-    if (!title || content === undefined) {
-      return res.status(400).json({ success: false, error: 'Title and content required' });
-    }
 
     const noteData = {
       title,
@@ -62,7 +66,7 @@ router.post('/', async (req: Request, res: Response) => {
       tags: Array.isArray(tags) ? tags.join(',') : (tags || ''),
       isPinned: isPinned ?? false,
       isFavorite: isFavorite ?? false,
-      pinLock: pinLock || null,
+      pinLock: pinLock ? hashPin(pinLock) : null,
       categoryId: categoryId || null,
       folderId: folderId || null,
       updatedAt: new Date(),
@@ -79,7 +83,7 @@ router.post('/', async (req: Request, res: Response) => {
         mockNotes.push(result);
       }
       await invalidateUserCache(userId);
-      return res.json({ success: true, note: result });
+      return res.json({ success: true, note: stripPinLock(result) });
     }
 
     let result;
@@ -98,9 +102,35 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     await invalidateUserCache(userId);
-    res.json({ success: true, note: result });
+    res.json({ success: true, note: stripPinLock(result) });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: 'Failed to save note' });
+  }
+});
+
+router.post('/verify-pin', validate(verifyPinSchemaDef), async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { noteId, pin } = req.body;
+
+    let storedHash: string | null = null;
+
+    if (!getDb()) {
+      const note = mockNotes.find(n => n.id === noteId && n.userId === userId);
+      storedHash = note?.pinLock || null;
+    } else {
+      const result = await getDb().select({ pinLock: notes.pinLock }).from(notes).where(and(eq(notes.id, noteId), eq(notes.userId, userId)));
+      storedHash = result[0]?.pinLock || null;
+    }
+
+    if (!storedHash) {
+      return res.status(404).json({ success: false, error: 'Note not found or no PIN set' });
+    }
+
+    const valid = verifyPin(pin, storedHash);
+    res.json({ success: valid });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: 'PIN verification failed' });
   }
 });
 

@@ -13,28 +13,28 @@ export function getClerkClient() {
 }
 
 export async function verifySession(token: string) {
-  try {
-    if (!clerkClient) return { userId: 'mock_student_id' };
-    const session = await (clerkClient.sessions as any).verifySession(token);
-    return { userId: session?.userId || 'mock_student_id' };
-  } catch {
-    return { userId: 'mock_student_id' };
+  if (!clerkClient) {
+    throw new Error('Clerk not configured');
   }
+  const session = await (clerkClient.sessions as any).verifySession(token);
+  if (!session?.userId) {
+    throw new Error('Invalid session');
+  }
+  return { userId: session.userId };
 }
 
 export async function authMiddleware(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
   const sessionToken = authHeader?.startsWith('Bearer ')
     ? authHeader.slice(7)
-    : req.headers['x-session-token'] || req.query.token;
+    : req.headers['x-session-token'];
 
-  if (!sessionToken && !env.CLERK_SECRET_KEY) {
-    req.userId = 'mock_student_id';
-    return next();
+  if (!sessionToken) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
   }
 
   try {
-    const { userId } = await verifySession(sessionToken || '');
+    const { userId } = await verifySession(sessionToken);
     req.userId = userId;
     next();
   } catch (error) {

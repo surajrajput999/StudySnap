@@ -22,7 +22,8 @@ router.post('/clerk', async (req: Request, res: Response) => {
 
     res.json({ success: true, received: true });
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('[Webhook] Error:', error?.message);
+    res.status(500).json({ success: false, error: 'Webhook processing failed' });
   }
 });
 export default router;

@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authMiddleware } from '../middleware/auth';
+import { validate, revisionSchema } from '../middleware/validate';
 import { computeNextRevision, generateId } from '../utils/helpers';
 
 const router = Router();
@@ -18,13 +19,9 @@ let mockNotesRevision: { [key: string]: { revisionStreak: number; lastRevisedAt:
 
 router.use(authMiddleware);
 
-router.post('/mark', (req: Request, res: Response) => {
+router.post('/mark', validate(revisionSchema), (req: Request, res: Response) => {
   const userId = (req as any).userId;
   const { noteId, rating } = req.body;
-
-  if (!noteId || !rating) {
-    return res.status(400).json({ success: false, error: 'noteId and rating required' });
-  }
 
   const nextRev = computeNextRevision(rating);
   const now = new Date().toISOString();

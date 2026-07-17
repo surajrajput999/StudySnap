@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '@/lib/store/useStore';
+import DOMPurify from 'dompurify';
 import {
   ArrowLeft, Pin, Star, Lock, Unlock, Download, Upload,
   Volume2, VolumeX, Mic, MicOff, Tag, FolderOpen, RefreshCw,
@@ -213,7 +214,7 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
       setHistoryIndex(newIndex);
       const html = history[newIndex];
       if (editorRef.current) {
-        editorRef.current.innerHTML = html;
+        editorRef.current.innerHTML = DOMPurify.sanitize(html);
         setContent(html);
       }
     }
@@ -225,7 +226,7 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
       setHistoryIndex(newIndex);
       const html = history[newIndex];
       if (editorRef.current) {
-        editorRef.current.innerHTML = html;
+        editorRef.current.innerHTML = DOMPurify.sanitize(html);
         setContent(html);
       }
     }
@@ -331,7 +332,8 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
   const insertImage = () => {
     const url = prompt('Paste image URL:');
     if (url) {
-      const html = `<figure class="editor-image-block"><img src="${url}" alt="Image" loading="lazy" /><figcaption>Image</figcaption></figure>`;
+      const sanitizedUrl = url.replace(/^javascript:/i, '').replace(/<[^>]*>/g, '');
+      const html = `<figure class="editor-image-block"><img src="${sanitizedUrl}" alt="Image" loading="lazy" /><figcaption>Image</figcaption></figure>`;
       insertAtCursor(html);
       if (editorRef.current) handleEditorInput();
     }
@@ -471,7 +473,7 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
   const insertAiResponse = () => {
     if (aiResponse) {
       const html = aiResponse.replace(/\n/g, '<br>');
-      insertAtCursor(`<p>${html}</p>`);
+      insertAtCursor(DOMPurify.sanitize(`<p>${html}</p>`));
       if (editorRef.current) handleEditorInput();
       setShowAiAssistant(false);
       setAiPrompt('');
@@ -588,7 +590,7 @@ export default function NoteEditor({ noteId, onBack }: NoteEditorProps) {
           suppressContentEditableWarning
           onInput={handleEditorInput}
           onKeyDown={handleKeyDown}
-          dangerouslySetInnerHTML={{ __html: content || '<p><br></p>' }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) || '<p><br></p>' }}
         />
       </div>
 
