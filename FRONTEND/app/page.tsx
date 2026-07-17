@@ -181,7 +181,7 @@ export default function Page() {
             />
           )}
           {activeTab === 'calendar' && <RevisionCalendar />}
-          {activeTab === 'ai' && <AiTutor />}
+          {activeTab === 'ai' && <AiTutor onBack={() => setActiveTab('home')} />}
           {activeTab === 'gamification' && <GamificationHub />}
           {activeTab === 'profile' && <ProfileView />}
         </div>

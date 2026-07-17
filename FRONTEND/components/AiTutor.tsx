@@ -11,7 +11,8 @@ import rehypeKatex from 'rehype-katex';
 import {
   Sparkles, Send, Paperclip, Mic, Bot, User, BookOpen,
   FileText, LayoutGrid, HelpCircle, Languages, Lightbulb,
-  StopCircle, Copy, Check, X, ChevronDown, ChevronUp, Loader2
+  StopCircle, Copy, Check, X, ChevronDown, ChevronUp, Loader2,
+  ArrowLeft
 } from 'lucide-react';
 
 const QUICK_CHIPS = [
@@ -106,7 +107,7 @@ const TOOL_PROMPTS: Record<string, string> = {
   pdf: 'I have a PDF document. Please help me analyze, summarize, and extract key information from it.',
 };
 
-export default function AiTutor() {
+export default function AiTutor({ onBack }: { onBack?: () => void }) {
   const { getToken, isSignedIn } = useAuth();
   const { activeAiTool, setActiveAiTool } = useStore();
   const [messages, setMessages] = useState<Message[]>([
@@ -338,6 +339,11 @@ export default function AiTutor() {
     <div className="tutor-container" ref={containerRef}>
       <div className="tutor-header">
         <div className="tutor-header-left">
+          {onBack && (
+            <button className="tutor-back-btn" onClick={onBack} aria-label="Back">
+              <ArrowLeft size={20} />
+            </button>
+          )}
           <div className="tutor-avatar">
             <Sparkles size={18} />
           </div>
