@@ -1,22 +1,11 @@
-import { createClerkClient } from '@clerk/backend';
+import { verifyToken } from '@clerk/backend';
 import { env } from '../config/env';
 
-const clerkClient = env.CLERK_SECRET_KEY
-  ? createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
-  : null;
-
-export function getClerkClient() {
-  if (!clerkClient) {
-    throw new Error('Clerk not configured. Set CLERK_SECRET_KEY env.');
-  }
-  return clerkClient;
-}
-
 export async function verifySession(token: string) {
-  if (!clerkClient) {
+  if (!env.CLERK_SECRET_KEY) {
     throw new Error('Clerk not configured');
   }
-  const claims = await clerkClient.verifyToken(token);
+  const claims = await verifyToken(token, { secretKey: env.CLERK_SECRET_KEY });
   if (!claims?.sub) {
     throw new Error('Invalid session');
   }
