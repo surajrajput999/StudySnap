@@ -46,59 +46,79 @@
 
 ## 📸 Screenshots
 
-### 🖥 Desktop Experience
+> *Place your screenshots in `public/screenshots/` and update the `src` paths below.*
+>
+> **Recommended capture:** 1440×900 viewport, light theme for GitHub, dark theme for LinkedIn.
+
+### 🖥 Dashboard Overview
 
 <div align="center">
-  <div style="display: inline-block; width: 49%; vertical-align: top; margin-bottom: 24px;">
-    <img src="public/screenshots/dashboard-desktop.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-    <br>
-    <strong>Dashboard</strong><br>
-    <span style="color: #666; font-size: 0.9em;">Modern productivity dashboard with AI-powered study tools.</span>
-  </div>
+  <table>
+    <tr>
+      <td width="50%" align="center">
+        <img src="public/screenshots/dashboard-top.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+        <br>
+        <strong>Dashboard — Top Section</strong><br>
+        <span style="color: #666; font-size: 0.85em;">Header · Hero · Stats · AI Tools · Search</span>
+      </td>
+      <td width="50%" align="center">
+        <img src="public/screenshots/dashboard-bottom.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+        <br>
+        <strong>Dashboard — Bottom Section</strong><br>
+        <span style="color: #666; font-size: 0.85em;">Categories · Folders · Notes Grid</span>
+      </td>
+    </tr>
+  </table>
+</div>
+
+> Scrolls seamlessly — the divider sits between **Search Bar** and **Categories**.
+
+### 🖥 Desktop Features
+
+<div align="center">
   <div style="display: inline-block; width: 49%; vertical-align: top; margin-bottom: 24px;">
     <img src="public/screenshots/note-editor.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
     <br>
     <strong>Note Editor</strong><br>
     <span style="color: #666; font-size: 0.9em;">Rich text editor with auto-save, speech-to-text, and PIN lock.</span>
   </div>
-</div>
-
-<div align="center">
   <div style="display: inline-block; width: 49%; vertical-align: top; margin-bottom: 24px;">
     <img src="public/screenshots/ai-assistant.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
     <br>
     <strong>AI Assistant</strong><br>
     <span style="color: #666; font-size: 0.9em;">SnapAI chat — summarization, quizzes, flashcards, translation.</span>
   </div>
+</div>
+
+<div align="center">
   <div style="display: inline-block; width: 49%; vertical-align: top; margin-bottom: 24px;">
     <img src="public/screenshots/voice-notes.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
     <br>
     <strong>Voice Notes</strong><br>
     <span style="color: #666; font-size: 0.9em;">Audio recorder with variable speed playback and live transcription.</span>
   </div>
-</div>
-
-<div align="center">
   <div style="display: inline-block; width: 49%; vertical-align: top; margin-bottom: 24px;">
     <img src="public/screenshots/revision-calendar.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
     <br>
     <strong>Revision Calendar</strong><br>
     <span style="color: #666; font-size: 0.9em;">Spaced repetition scheduler with streaks and difficulty ratings.</span>
   </div>
+</div>
+
+<div align="center">
   <div style="display: inline-block; width: 49%; vertical-align: top; margin-bottom: 24px;">
     <img src="public/screenshots/profile-dashboard.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
     <br>
     <strong>Profile Dashboard</strong><br>
     <span style="color: #666; font-size: 0.9em;">Student profile — XP, study zones, goals and achievements.</span>
   </div>
+  <div style="display: inline-block; width: 49%; vertical-align: top; margin-bottom: 24px;">
+    <img src="public/screenshots/dark-dashboard.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+    <br>
+    <strong>Dark Mode</strong><br>
+    <span style="color: #666; font-size: 0.9em;">Full dark theme with MD3 elevation and glassmorphism.</span>
+  </div>
 </div>
-
-<p align="center">
-  <img src="public/screenshots/dark-dashboard.png" width="100%" style="max-width: 900px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
-  <br>
-  <strong>Dark Mode</strong><br>
-  <span style="color: #666; font-size: 0.9em;">Full dark theme with MD3 elevation and glassmorphism.</span>
-</p>
 
 ---
 
