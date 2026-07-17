@@ -645,6 +645,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ─── AI Hero Section ─── */
+/* ─── Screenshot Split Divider ─── */
+.screenshot-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--outline-variant), transparent);
+  margin: 0;
+  opacity: 0.6;
+}
+
 .ai-hero {
   border-radius: var(--card-radius-xl);
   padding: 32px;
