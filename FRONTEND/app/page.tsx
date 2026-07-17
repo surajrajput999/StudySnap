@@ -27,6 +27,14 @@ export default function Page() {
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('returnTo') === 'ai') {
+      setActiveTab('ai');
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isSignedIn && clerkUser?.fullName) {
       updateProfile({ name: clerkUser.fullName });
     } else if (!isSignedIn) {

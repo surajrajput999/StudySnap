@@ -14,6 +14,7 @@ import {
   StopCircle, Copy, Check, X, ChevronDown, ChevronUp, Loader2,
   ArrowLeft
 } from 'lucide-react';
+import SignInPrompt from '@/components/SignInPrompt';
 
 const QUICK_CHIPS = [
   { id: 'explain', label: 'Explain', icon: BookOpen, color: '#3B82F6', prompt: 'Explain this concept in simple terms with examples.' },
@@ -108,8 +109,16 @@ const TOOL_PROMPTS: Record<string, string> = {
 };
 
 export default function AiTutor({ onBack }: { onBack?: () => void }) {
-  const { getToken, isSignedIn } = useAuth();
+  const { getToken, isSignedIn, isLoaded } = useAuth();
   const { activeAiTool, setActiveAiTool } = useStore();
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [authTimedOut, setAuthTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (isLoaded) return;
+    const timer = setTimeout(() => setAuthTimedOut(true), 10000);
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: '👋 Hi! I\'m your AI Tutor. Ask me anything about your studies, or try one of the quick actions below!' }
   ]);
@@ -127,6 +136,10 @@ export default function AiTutor({ onBack }: { onBack?: () => void }) {
     document.body.classList.add('ai-active');
     return () => document.body.classList.remove('ai-active');
   }, []);
+
+  useEffect(() => {
+    if (isSignedIn) setSessionExpired(false);
+  }, [isSignedIn]);
 
   useEffect(() => {
     if (chatEndRef.current && !messages.some(m => m.isStreaming)) {
@@ -236,21 +249,6 @@ export default function AiTutor({ onBack }: { onBack?: () => void }) {
     const msg = (text || input).trim();
     if (!msg || isLoading) return;
 
-    if (!isSignedIn) {
-      const signInMsg = `🔒 **Sign In Required**\n\nPlease sign in using the **Sign In** button in the top-right corner to use AI Tutor.`;
-      addStreamingMessage('');
-      setTimeout(() => {
-        setMessages(prev => {
-          const last = prev[prev.length - 1];
-          if (last?.isStreaming) {
-            return [...prev.slice(0, -1), { role: 'assistant', content: signInMsg, isStreaming: false }];
-          }
-          return prev;
-        });
-      }, 100);
-      return;
-    }
-
     setInput('');
     setAttachedFile(null);
     const userMsg: Message = { role: 'user', content: msg };
@@ -309,9 +307,9 @@ export default function AiTutor({ onBack }: { onBack?: () => void }) {
           `Try asking a shorter or simpler question. The Groq model may be under load.\n\n` +
           `_Error: ${msg}_`;
       } else if (msg.includes('Authentication required') || msg.includes('401') || msg.includes('Invalid or expired session')) {
-        userMessage = `🔒 **Sign In Required** — Your session is missing or expired.\n\n` +
-          `Please sign in using the **Sign In** button in the top-right corner, then try again.\n\n` +
-          `If you're already signed in, your session may have expired — try signing out and back in.`;
+        setIsLoading(false);
+        setSessionExpired(true);
+        return;
       } else {
         userMessage = `⚠️ **Error:** ${msg}\n\nPlease try again or rephrase your question.`;
       }
@@ -388,168 +386,205 @@ export default function AiTutor({ onBack }: { onBack?: () => void }) {
         </div>
       </div>
 
-      <div className="tutor-chat" ref={chatContainerRef}>
-        {!hasMessages && (
-          <div className="tutor-chips">
-            {QUICK_CHIPS.map(chip => (
-              <button
-                key={chip.id}
-                className="tutor-chip"
-                onClick={() => handleQuickChip(chip)}
-                disabled={isLoading}
-                style={{ '--chip-color': chip.color } as React.CSSProperties}
-              >
-                <chip.icon size={14} />
-                {chip.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`tutor-message tutor-message-${msg.role}`}>
-            <div className="tutor-message-avatar">
-              {msg.role === 'assistant' ? <Bot size={16} /> : <User size={16} />}
-            </div>
-            <div className="tutor-message-bubble">
-              {msg.role === 'assistant' && msg.isStreaming ? (
-                <div className="tutor-streaming">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkMath]}
-                    rehypePlugins={[rehypeKatex]}
-                    components={{
-                      code({ className, children, ...props }) {
-                        const isInline = !className;
-                        const codeStr = String(children).replace(/\n$/, '');
-                        if (isInline) return <InlineCode>{children}</InlineCode>;
-                        const language = className?.replace('language-', '') || '';
-                        return <CodeBlock code={codeStr} language={language} />;
-                      },
-                      pre({ children }) { return <>{children}</>; },
-                    }}
-                  >
-                    {msg.content}
-                  </ReactMarkdown>
-                  <span className="tutor-cursor" />
-                </div>
-              ) : (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm, remarkMath]}
-                  rehypePlugins={[rehypeKatex]}
-                  components={{
-                    code({ className, children, ...props }) {
-                      const isInline = !className;
-                      const codeStr = String(children).replace(/\n$/, '');
-                      if (isInline) return <InlineCode>{children}</InlineCode>;
-                      const language = className?.replace('language-', '') || '';
-                      return <CodeBlock code={codeStr} language={language} />;
-                    },
-                    pre({ children }) { return <>{children}</>; },
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
-              )}
-            </div>
-          </div>
-        ))}
-        {isLoading && !messages[messages.length - 1]?.isStreaming && (
-          <div className="tutor-message tutor-message-assistant">
-            <div className="tutor-message-avatar">
-              <Bot size={16} />
-            </div>
-            <div className="tutor-message-bubble">
-              <div className="tutor-typing">
-                <span className="tutor-typing-dot" />
-                <span className="tutor-typing-dot" />
-                <span className="tutor-typing-dot" />
+      {!isLoaded ? (
+        <div className="signin-prompt-overlay">
+          <div className="signin-prompt-card auth-loading-card">
+            <div className="signin-prompt-glow" />
+            <div className="auth-loading-body">
+              <div className="auth-loading-spinner">
+                <Loader2 size={28} className="tutor-spin" />
               </div>
+              <div className="auth-loading-label">Checking authentication...</div>
             </div>
           </div>
-        )}
-        <div ref={chatEndRef} />
-      </div>
-
-      {hasMessages && attachedFile && (
-        <div className="tutor-attached">
-          <Paperclip size={14} />
-          <span className="tutor-attached-name">{attachedFile.name}</span>
-          <button className="tutor-attached-remove" onClick={() => setAttachedFile(null)}>
-            <X size={14} />
-          </button>
         </div>
+      ) : authTimedOut ? (
+        <div className="signin-prompt-overlay">
+          <div className="signin-prompt-card">
+            <div className="signin-prompt-glow" />
+            <div className="auth-error-body">
+              <div className="auth-error-icon">⚠️</div>
+              <h3 className="auth-error-title">Authentication Unavailable</h3>
+              <p className="auth-error-desc">
+                Unable to verify your identity. Please check your network connection and try again.
+              </p>
+              <button
+                className="signin-prompt-btn"
+                onClick={() => { setAuthTimedOut(false); window.location.reload(); }}
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : isSignedIn && !sessionExpired ? (
+        <>
+          <div className="tutor-chat" ref={chatContainerRef}>
+            {!hasMessages && (
+              <div className="tutor-chips">
+                {QUICK_CHIPS.map(chip => (
+                  <button
+                    key={chip.id}
+                    className="tutor-chip"
+                    onClick={() => handleQuickChip(chip)}
+                    disabled={isLoading}
+                    style={{ '--chip-color': chip.color } as React.CSSProperties}
+                  >
+                    <chip.icon size={14} />
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {messages.map((msg, idx) => (
+              <div key={idx} className={`tutor-message tutor-message-${msg.role}`}>
+                <div className="tutor-message-avatar">
+                  {msg.role === 'assistant' ? <Bot size={16} /> : <User size={16} />}
+                </div>
+                <div className="tutor-message-bubble">
+                  {msg.role === 'assistant' && msg.isStreaming ? (
+                    <div className="tutor-streaming">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
+                        components={{
+                          code({ className, children, ...props }) {
+                            const isInline = !className;
+                            const codeStr = String(children).replace(/\n$/, '');
+                            if (isInline) return <InlineCode>{children}</InlineCode>;
+                            const language = className?.replace('language-', '') || '';
+                            return <CodeBlock code={codeStr} language={language} />;
+                          },
+                          pre({ children }) { return <>{children}</>; },
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                      <span className="tutor-cursor" />
+                    </div>
+                  ) : (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+                      components={{
+                        code({ className, children, ...props }) {
+                          const isInline = !className;
+                          const codeStr = String(children).replace(/\n$/, '');
+                          if (isInline) return <InlineCode>{children}</InlineCode>;
+                          const language = className?.replace('language-', '') || '';
+                          return <CodeBlock code={codeStr} language={language} />;
+                        },
+                        pre({ children }) { return <>{children}</>; },
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  )}
+                </div>
+              </div>
+            ))}
+            {isLoading && !messages[messages.length - 1]?.isStreaming && (
+              <div className="tutor-message tutor-message-assistant">
+                <div className="tutor-message-avatar">
+                  <Bot size={16} />
+                </div>
+                <div className="tutor-message-bubble">
+                  <div className="tutor-typing">
+                    <span className="tutor-typing-dot" />
+                    <span className="tutor-typing-dot" />
+                    <span className="tutor-typing-dot" />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          {hasMessages && attachedFile && (
+            <div className="tutor-attached">
+              <Paperclip size={14} />
+              <span className="tutor-attached-name">{attachedFile.name}</span>
+              <button className="tutor-attached-remove" onClick={() => setAttachedFile(null)}>
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          <div className="tutor-input-area">
+            <div className="tutor-input-bar">
+              <button
+                className="tutor-input-btn"
+                onClick={() => setShowAttachMenu(!showAttachMenu)}
+                title="Attach file"
+              >
+                <Paperclip size={20} />
+              </button>
+              <div className="tutor-input-wrap">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="tutor-input"
+                  placeholder="Ask your AI tutor anything..."
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onFocus={handleInputFocus}
+                  disabled={isLoading}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                />
+              </div>
+              <button
+                className="tutor-input-btn"
+                title="Voice input"
+                onClick={() => {
+                  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+                    const recognition = new SpeechRecognition();
+                    recognition.lang = 'en-US';
+                    recognition.interimResults = false;
+                    recognition.onresult = (event: any) => {
+                      const transcript = event.results[0][0].transcript;
+                      setInput(prev => prev + transcript);
+                    };
+                    recognition.start();
+                  } else {
+                    alert('Speech recognition is not supported in this browser.');
+                  }
+                }}
+              >
+                <Mic size={20} />
+              </button>
+              <button
+                className="tutor-send-btn"
+                onClick={() => handleSend()}
+                disabled={!input.trim() || isLoading}
+              >
+                {isLoading ? <Loader2 size={20} className="tutor-spin" /> : <Send size={20} />}
+              </button>
+            </div>
+
+            {showAttachMenu && (
+              <div className="tutor-attach-menu">
+                <button className="tutor-attach-option" onClick={() => fileInputRef.current?.click()}>
+                  <Paperclip size={16} />
+                  Upload PDF or Text
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.txt,.md,.json,.csv,.py,.js,.ts,.jsx,.tsx,.html,.css"
+                  style={{ display: 'none' }}
+                  onChange={handleAttachFile}
+                />
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <SignInPrompt />
       )}
-
-      <div className="tutor-input-area">
-        <div className="tutor-input-bar">
-          <button
-            className="tutor-input-btn"
-            onClick={() => setShowAttachMenu(!showAttachMenu)}
-            title="Attach file"
-          >
-            <Paperclip size={20} />
-          </button>
-          <div className="tutor-input-wrap">
-            <input
-              ref={inputRef}
-              type="text"
-              className="tutor-input"
-              placeholder="Ask your AI tutor anything..."
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={handleInputFocus}
-              disabled={isLoading}
-              autoCapitalize="off"
-              autoCorrect="off"
-            />
-          </div>
-          <button
-            className="tutor-input-btn"
-            title="Voice input"
-            onClick={() => {
-              if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'en-US';
-                recognition.interimResults = false;
-                recognition.onresult = (event: any) => {
-                  const transcript = event.results[0][0].transcript;
-                  setInput(prev => prev + transcript);
-                };
-                recognition.start();
-              } else {
-                alert('Speech recognition is not supported in this browser.');
-              }
-            }}
-          >
-            <Mic size={20} />
-          </button>
-          <button
-            className="tutor-send-btn"
-            onClick={() => handleSend()}
-            disabled={!input.trim() || isLoading}
-          >
-            {isLoading ? <Loader2 size={20} className="tutor-spin" /> : <Send size={20} />}
-          </button>
-        </div>
-
-        {showAttachMenu && (
-          <div className="tutor-attach-menu">
-            <button className="tutor-attach-option" onClick={() => fileInputRef.current?.click()}>
-              <Paperclip size={16} />
-              Upload PDF or Text
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.txt,.md,.json,.csv,.py,.js,.ts,.jsx,.tsx,.html,.css"
-              style={{ display: 'none' }}
-              onChange={handleAttachFile}
-            />
-          </div>
-        )}
-      </div>
     </div>
   );
 }

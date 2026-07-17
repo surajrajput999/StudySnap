@@ -5956,3 +5956,313 @@ h1, h2, h3, h4, h5, h6 {
   border-top: 1px solid var(--outline-variant);
   flex-shrink: 0;
 }
+
+/* ═══════════════════════════════════════════
+   SIGN IN PROMPT — AI Tutor Premium Card
+   ═══════════════════════════════════════════ */
+
+.signin-prompt-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  padding: 20px;
+  min-height: 0;
+}
+
+.signin-prompt-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 28px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--glass-shadow), 0 8px 40px var(--shadow-color);
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.signin-prompt-glow {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.signin-prompt-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.signin-prompt-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-container);
+  margin-bottom: 2px;
+  box-shadow: 0 4px 16px rgba(0, 97, 164, 0.15);
+}
+
+.signin-prompt-icon-emoji {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.signin-prompt-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--on-surface);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.signin-prompt-desc {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.signin-prompt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.signin-prompt-grid-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-variant);
+  animation: fadeIn 0.4s ease-out both;
+}
+
+.signin-prompt-grid-item:nth-child(1) { animation-delay: 0.05s; }
+.signin-prompt-grid-item:nth-child(2) { animation-delay: 0.10s; }
+.signin-prompt-grid-item:nth-child(3) { animation-delay: 0.15s; }
+.signin-prompt-grid-item:nth-child(4) { animation-delay: 0.20s; }
+.signin-prompt-grid-item:nth-child(5) { animation-delay: 0.25s; }
+.signin-prompt-grid-item:nth-child(6) { animation-delay: 0.30s; }
+.signin-prompt-grid-item:nth-child(7) { animation-delay: 0.35s; }
+.signin-prompt-grid-item:nth-child(8) { animation-delay: 0.40s; }
+
+.signin-prompt-grid-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
+.signin-prompt-grid-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface);
+  font-family: var(--font-title);
+  line-height: 1.2;
+}
+
+/* ─── Auth Loading & Error States ─── */
+
+.auth-loading-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.auth-loading-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+.auth-loading-spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-container);
+}
+
+.auth-loading-label {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  font-family: var(--font-title);
+  font-weight: 600;
+}
+
+.auth-error-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.auth-error-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--error-container, #fce4ec);
+  font-size: 26px;
+  margin-bottom: 4px;
+}
+
+.auth-error-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--on-surface);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.auth-error-desc {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.auth-error-body .signin-prompt-btn {
+  margin-top: 8px;
+  max-width: 200px;
+}
+
+.signin-prompt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--on-primary);
+  font-family: var(--font-title);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 97, 164, 0.3);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.signin-prompt-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.15), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.signin-prompt-btn:hover::after { opacity: 1; }
+
+.signin-prompt-btn:hover {
+  box-shadow: 0 6px 28px rgba(0, 97, 164, 0.4);
+  transform: translateY(-1px);
+}
+
+.signin-prompt-btn:active {
+  transform: scale(0.97);
+}
+
+.signin-prompt-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.signin-prompt-btn-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.signin-prompt-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--error-container, #fce4ec);
+  color: var(--on-error-container, #b71c1c);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.signin-prompt-privacy {
+  text-align: center;
+  font-size: 11px;
+  color: var(--outline);
+  margin-top: 16px;
+  line-height: 1.4;
+}
+
+@media (max-width: 400px) {
+  .signin-prompt-card {
+    padding: 24px 18px;
+  }
+  .signin-prompt-title {
+    font-size: 19px;
+  }
+  .signin-prompt-grid {
+    gap: 6px;
+  }
+  .signin-prompt-grid-item {
+    padding: 6px 8px;
+  }
+  .signin-prompt-grid-label {
+    font-size: 11px;
+  }
+  .signin-prompt-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+  .signin-prompt-icon-emoji {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 340px) {
+  .signin-prompt-grid {
+    grid-template-columns: 1fr;
+  }
+}
