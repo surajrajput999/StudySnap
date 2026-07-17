@@ -107,7 +107,7 @@ const TOOL_PROMPTS: Record<string, string> = {
 };
 
 export default function AiTutor() {
-  const { getToken } = useAuth();
+  const { getToken, isSignedIn } = useAuth();
   const { activeAiTool, setActiveAiTool } = useStore();
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: '👋 Hi! I\'m your AI Tutor. Ask me anything about your studies, or try one of the quick actions below!' }
@@ -205,6 +205,21 @@ export default function AiTutor() {
     const msg = (text || input).trim();
     if (!msg || isLoading) return;
 
+    if (!isSignedIn) {
+      const signInMsg = `🔒 **Sign In Required**\n\nPlease sign in using the **Sign In** button in the top-right corner to use AI Tutor.`;
+      addStreamingMessage('');
+      setTimeout(() => {
+        setMessages(prev => {
+          const last = prev[prev.length - 1];
+          if (last?.isStreaming) {
+            return [...prev.slice(0, -1), { role: 'assistant', content: signInMsg, isStreaming: false }];
+          }
+          return prev;
+        });
+      }, 100);
+      return;
+    }
+
     setInput('');
     setAttachedFile(null);
     const userMsg: Message = { role: 'user', content: msg };
@@ -262,6 +277,10 @@ export default function AiTutor() {
         userMessage = `⏱️ **Request Timeout** — The AI took too long to respond.\n\n` +
           `Try asking a shorter or simpler question. The Groq model may be under load.\n\n` +
           `_Error: ${msg}_`;
+      } else if (msg.includes('Authentication required') || msg.includes('401') || msg.includes('Invalid or expired session')) {
+        userMessage = `🔒 **Sign In Required** — Your session is missing or expired.\n\n` +
+          `Please sign in using the **Sign In** button in the top-right corner, then try again.\n\n` +
+          `If you're already signed in, your session may have expired — try signing out and back in.`;
       } else {
         userMessage = `⚠️ **Error:** ${msg}\n\nPlease try again or rephrase your question.`;
       }
