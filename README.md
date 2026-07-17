@@ -46,32 +46,50 @@
 
 ## 📸 Screenshots
 
-> *Place your screenshots in `public/screenshots/` and update the `src` paths below.*
->
-> **Recommended capture:** 1440×900 viewport, light theme for GitHub, dark theme for LinkedIn.
-
 ### 🖥 Dashboard Overview
 
 <div align="center">
   <table>
     <tr>
+      <th colspan="2" align="center">☀️ Light Theme</th>
+    </tr>
+    <tr>
       <td width="50%" align="center">
         <img src="public/screenshots/dashboard-top.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
         <br>
-        <strong>Dashboard — Top Section</strong><br>
+        <strong>Top Section</strong><br>
         <span style="color: #666; font-size: 0.85em;">Header · Hero · Stats · AI Tools · Search</span>
       </td>
       <td width="50%" align="center">
         <img src="public/screenshots/dashboard-bottom.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
         <br>
-        <strong>Dashboard — Bottom Section</strong><br>
+        <strong>Bottom Section</strong><br>
         <span style="color: #666; font-size: 0.85em;">Categories · Folders · Notes Grid</span>
       </td>
     </tr>
   </table>
+  <br>
+  <table>
+    <tr>
+      <th colspan="2" align="center">🌙 Dark Theme</th>
+    </tr>
+    <tr>
+      <td width="50%" align="center">
+        <img src="public/screenshots/dashboard-top-dark.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+        <br>
+        <strong>Top Section</strong><br>
+        <span style="color: #666; font-size: 0.85em;">Header · Hero · Stats · AI Tools · Search</span>
+      </td>
+      <td width="50%" align="center">
+        <img src="public/screenshots/dashboard-bottom-dark.png" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+        <br>
+        <strong>Bottom Section</strong><br>
+        <span style="color: #666; font-size: 0.85em;">Categories · Folders · Notes Grid</span>
+      </td>
+    </tr>
+  </table>
+  <p style="color: #666; font-size: 0.85em;">Each pair scrolls seamlessly — the divider sits between the <strong>Search Bar</strong> and <strong>Categories</strong>.</p>
 </div>
-
-> Scrolls seamlessly — the divider sits between **Search Bar** and **Categories**.
 
 ### 🖥 Desktop Features
 
