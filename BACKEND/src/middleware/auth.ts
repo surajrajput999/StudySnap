@@ -16,11 +16,11 @@ export async function verifySession(token: string) {
   if (!clerkClient) {
     throw new Error('Clerk not configured');
   }
-  const session = await (clerkClient.sessions as any).verifySession(token);
-  if (!session?.userId) {
+  const claims = await clerkClient.verifyToken(token);
+  if (!claims?.sub) {
     throw new Error('Invalid session');
   }
-  return { userId: session.userId };
+  return { userId: claims.sub };
 }
 
 export async function authMiddleware(req: any, res: any, next: any) {
