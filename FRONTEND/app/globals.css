@@ -2863,6 +2863,7 @@ h1, h2, h3, h4, h5, h6 {
   min-height: 0;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* ─── Quick Chips ─── */
@@ -3149,6 +3150,8 @@ h1, h2, h3, h4, h5, h6 {
 .tutor-input-area {
   position: relative;
   flex-shrink: 0;
+  z-index: 10;
+  background: var(--background);
 }
 
 /* ─── Attached File ─── */
@@ -3196,16 +3199,20 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--surface);
   border-top: 1px solid var(--outline-variant);
   flex-shrink: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .tutor-input-wrap {
   flex: 1;
   display: flex;
+  align-items: center;
   background: var(--surface-variant);
   border-radius: 24px;
   padding: 2px 4px 2px 16px;
   border: 1.5px solid transparent;
   transition: border-color var(--transition-fast);
+  min-width: 0;
 }
 .tutor-input-wrap:focus-within {
   border-color: var(--primary);
@@ -3328,7 +3335,8 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
   }
   .tutor-chat {
-    padding: 8px 12px 4px;
+    padding: 8px 10px 4px;
+    gap: 4px;
   }
   .tutor-message-bubble {
     padding: 6px 10px;
@@ -3337,15 +3345,24 @@ h1, h2, h3, h4, h5, h6 {
   .tutor-input-bar {
     padding: 4px 8px;
     padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+    gap: 4px;
   }
   .tutor-input-btn,
   .tutor-send-btn {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
+  }
+  .tutor-input-btn svg,
+  .tutor-send-btn svg {
+    width: 16px;
+    height: 16px;
   }
   .tutor-input {
     font-size: 13px;
     padding: 4px 0;
+  }
+  .tutor-input-wrap {
+    padding: 1px 4px 1px 10px;
   }
 }
 
@@ -3365,11 +3382,20 @@ h1, h2, h3, h4, h5, h6 {
   }
   .tutor-input-btn,
   .tutor-send-btn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
+  }
+  .tutor-input-btn svg,
+  .tutor-send-btn svg {
+    width: 18px;
+    height: 18px;
   }
   .tutor-input-wrap {
-    padding: 2px 4px 2px 12px;
+    padding: 2px 4px 2px 10px;
+  }
+  .tutor-input {
+    font-size: 14px;
+    padding: 6px 0;
   }
 }
 
@@ -5160,7 +5186,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .ai-active .app-bottom-nav { display: none !important; }
 .ai-active .app-root { grid-template-rows: auto 1fr; }
-.ai-active .app-main { padding: 0; }
+.ai-active .app-main { padding: 0; overflow: hidden; max-height: 100%; }
 
 .keyboard-open .ai-active .tutor-chat {
   padding-bottom: var(--chat-pb, 0px);

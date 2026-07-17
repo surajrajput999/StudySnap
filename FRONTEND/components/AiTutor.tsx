@@ -140,31 +140,55 @@ export default function AiTutor({ onBack }: { onBack?: () => void }) {
 
     const root = document.documentElement;
     let previousKb = 0;
+    let initialHeight = vv.height;
 
     const onViewportChange = () => {
-      const kbHeight = Math.max(0, window.innerHeight - vv.height);
-      const isOpen = kbHeight > 80;
+      const vpHeight = vv.height;
+      const delta = Math.max(0, initialHeight - vpHeight);
+      const winDelta = Math.max(0, window.innerHeight - vpHeight);
+      const kbHeight = Math.max(delta, winDelta);
+      const isOpen = kbHeight > 100;
 
-      root.style.setProperty('--viewport-height', `${vv.height}px`);
+      root.style.setProperty('--viewport-height', `${vpHeight}px`);
       root.style.setProperty('--keyboard-h', `${kbHeight}px`);
       root.classList.toggle('keyboard-open', isOpen);
-
       root.style.setProperty('--chat-pb', isOpen ? `${kbHeight}px` : '0px');
 
       if (isOpen && kbHeight !== previousKb) {
-        scrollToBottom();
+        requestAnimationFrame(() => {
+          scrollToBottom();
+          if (inputRef.current) {
+            inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
       }
 
       previousKb = kbHeight;
     };
 
+    const onFocusIn = () => {
+      requestAnimationFrame(() => {
+        const kbHeight = Math.max(0, initialHeight - vv.height);
+        if (kbHeight > 100) {
+          scrollToBottom();
+        }
+      });
+    };
+
     onViewportChange();
     vv.addEventListener('resize', onViewportChange);
     vv.addEventListener('scroll', onViewportChange);
+    window.addEventListener('focusin', onFocusIn);
+
+    const virtualKeyboard = (navigator as any).virtualKeyboard;
+    if (virtualKeyboard) {
+      virtualKeyboard.overlaysContent = false;
+    }
 
     return () => {
       vv.removeEventListener('resize', onViewportChange);
       vv.removeEventListener('scroll', onViewportChange);
+      window.removeEventListener('focusin', onFocusIn);
       root.classList.remove('keyboard-open');
       root.style.removeProperty('--viewport-height');
       root.style.removeProperty('--keyboard-h');
