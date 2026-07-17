@@ -175,10 +175,15 @@ export default function AiTutor({ onBack }: { onBack?: () => void }) {
       });
     };
 
+    const onWindowResize = () => {
+      root.style.setProperty('--viewport-height', `${vv.height}px`);
+    };
+
     onViewportChange();
     vv.addEventListener('resize', onViewportChange);
     vv.addEventListener('scroll', onViewportChange);
     window.addEventListener('focusin', onFocusIn);
+    window.addEventListener('resize', onWindowResize);
 
     const virtualKeyboard = (navigator as any).virtualKeyboard;
     if (virtualKeyboard) {
@@ -189,6 +194,7 @@ export default function AiTutor({ onBack }: { onBack?: () => void }) {
       vv.removeEventListener('resize', onViewportChange);
       vv.removeEventListener('scroll', onViewportChange);
       window.removeEventListener('focusin', onFocusIn);
+      window.removeEventListener('resize', onWindowResize);
       root.classList.remove('keyboard-open');
       root.style.removeProperty('--viewport-height');
       root.style.removeProperty('--keyboard-h');

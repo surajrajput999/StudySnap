@@ -2861,6 +2861,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 8px;
   padding: 16px 16px 8px;
   min-height: 0;
+  max-height: 100%;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
@@ -2894,6 +2895,8 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--chip-color, var(--primary));
   color: var(--chip-color, var(--primary));
   background: color-mix(in srgb, var(--chip-color, var(--primary)) 8%, var(--surface));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 .tutor-chip:disabled {
   opacity: 0.5;
@@ -3188,6 +3191,9 @@ h1, h2, h3, h4, h5, h6 {
   transition: all var(--transition-fast);
   flex-shrink: 0;
 }
+.tutor-attached-remove:hover {
+  background: rgba(0,0,0,0.18);
+}
 
 /* ─── Input Bar ─── */
 .tutor-input-bar {
@@ -3232,6 +3238,10 @@ h1, h2, h3, h4, h5, h6 {
   transition: all var(--transition-fast);
   flex-shrink: 0;
 }
+.tutor-input-btn:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface-variant);
+}
 .tutor-input-btn:active {
   background: var(--surface-variant);
   color: var(--on-surface-variant);
@@ -3247,9 +3257,11 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-body);
   padding: 8px 0;
   min-width: 0;
+  line-height: 20px;
 }
 .tutor-input::placeholder {
   color: var(--outline);
+  line-height: 20px;
 }
 
 .tutor-send-btn {
@@ -3265,6 +3277,10 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   transition: all var(--transition-fast);
   flex-shrink: 0;
+}
+.tutor-send-btn:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: 0 4px 16px rgba(0,97,164,0.3);
 }
 .tutor-send-btn:active:not(:disabled) {
   transform: scale(0.92);
